@@ -24,7 +24,7 @@ pub struct Dependency {
     pub values: Vec<DependencyDetails>,
 }
 
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct DependencyDetails {
     pub id: String,

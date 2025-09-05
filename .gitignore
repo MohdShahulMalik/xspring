@@ -1,2 +1,4 @@
 /target
-./logs
+logs/
+.cargo/
+NOTES.md
