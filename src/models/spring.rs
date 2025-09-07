@@ -11,6 +11,8 @@ pub struct InitializrMetadata {
     pub packaging: MetadataValue,
     #[serde(rename = "type")]
     pub project_type: MetadataValue,
+    pub name: DefaultText,
+    pub description: DefaultText,
 }
 
 #[derive(Serialize, Debug)]
@@ -47,6 +49,11 @@ pub struct DependencyCategories {
 pub struct MetadataValue {
     pub default: String,
     pub values: Vec<Value>,
+}
+
+#[derive(Deserialize, Debug)]
+pub struct DefaultText {
+    pub default: String,
 }
 
 #[derive(Deserialize, Debug, Clone)]

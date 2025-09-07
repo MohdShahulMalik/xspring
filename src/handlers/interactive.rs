@@ -1,9 +1,9 @@
 use inquire::{Text, Select, MultiSelect};
 use anyhow::{Context, Result};
 use tracing::{debug, trace};
-use crate::client::spring_initializr::get_metadata;
+use crate::{client::spring_initializr::get_metadata, models::spring::QueryParam};
 
-pub async fn pure_interactivity() -> Result<()> {
+pub async fn pure_interactivity() -> Result<QueryParam> {
     let spring_metadata = get_metadata().await?;
     trace!("Spring Metadata: {:?}", spring_metadata);
 
@@ -89,5 +89,70 @@ pub async fn pure_interactivity() -> Result<()> {
         .with_context(|| "Failed to get input for Dependencies")?;
     debug!("Selected Dependencies: {:?}", dependencies);
     
-    Ok(())
+    Ok(QueryParam {
+        project_type: project_type.id.clone(),
+        language: language.id.clone(),
+        boot_version: boot_version.id.clone(),
+        group_id ,
+        artifact_id: artifact_id.clone(),
+        name,
+        description,
+        packaging: packaging.id.clone(),
+        java_version: java_version.id.clone(),
+        dependencies: dependencies.iter().map(|dep| dep.id.clone() ).collect::<Vec<_>>().join(","),
+        base_dir: artifact_id
+    })
+}
+
+pub async fn quick_interactivity(extended: bool) -> Result<QueryParam>{
+    let spring_metadata = get_metadata().await
+        .with_context(|| "Failed to get the metadata")?;
+
+    let group_id: String = Text::new("Group ID:")
+        .with_help_message("e.g. com.example")
+        .prompt()
+        .with_context(|| "Failed to get input for Group ID")?;
+    debug!("Group ID: {}", group_id);
+
+    let artifact_id = Text::new("Artifact ID:")
+        .with_help_message("e.g. my-awesome-project")
+        .prompt()
+        .with_context(|| "Failed to get input for Artifact ID")?;
+    debug!("Artifact ID: {}", artifact_id);
+
+        
+    let mut name: Option<String> = None;
+    let mut description: Option<String> = None;
+
+    if extended {
+        let _name = Text::new("Project Name:")
+            .with_help_message("This will be the display name for your project")
+            .prompt()
+            .with_context(|| "Failed to get input for Project Name")?;
+        name = Some(_name);
+        debug!("Project Name Choice: {:?}", name);
+
+        let _description = Text::new("Description:")
+            .with_help_message("A brief description of your project.")
+            .prompt()
+            .with_context(|| "Failed to get input for Description")?;
+        description = Some(_description);
+        debug!("Project Description Choice: {:?}", description);
+      
+    }
+
+    Ok(QueryParam {
+        project_type: spring_metadata.project_type.default,
+        language: spring_metadata.language.default,
+        boot_version: spring_metadata.boot_version.default,
+        group_id,
+        artifact_id: artifact_id.clone(),
+        name: name.unwrap_or(spring_metadata.name.default),
+        description: description.unwrap_or(spring_metadata.description.default),
+        packaging: spring_metadata.packaging.default,
+        java_version: spring_metadata.java_version.default,
+        dependencies: "".to_string(),
+        base_dir: artifact_id,
+    })
+
 }
