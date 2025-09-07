@@ -104,7 +104,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
     })
 }
 
-pub async fn quick_interactivity(extended: bool) -> Result<QueryParam>{
+pub async fn quick_interactivity(extended: bool, maven: bool) -> Result<QueryParam>{
     let spring_metadata = get_metadata().await
         .with_context(|| "Failed to get the metadata")?;
 
@@ -123,6 +123,7 @@ pub async fn quick_interactivity(extended: bool) -> Result<QueryParam>{
         
     let mut name: Option<String> = None;
     let mut description: Option<String> = None;
+    let mut project_type = spring_metadata.project_type.default;
 
     if extended {
         let _name = Text::new("Project Name:")
@@ -141,8 +142,12 @@ pub async fn quick_interactivity(extended: bool) -> Result<QueryParam>{
       
     }
 
+    if maven {
+        project_type = "maven-project".to_string();
+    }
+
     Ok(QueryParam {
-        project_type: spring_metadata.project_type.default,
+        project_type,
         language: spring_metadata.language.default,
         boot_version: spring_metadata.boot_version.default,
         group_id,
