@@ -104,7 +104,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
     })
 }
 
-pub async fn quick_interactivity(extended: bool, maven: bool) -> Result<QueryParam>{
+pub async fn quick_interactivity(maven: bool, extended: bool) -> Result<QueryParam>{
     let spring_metadata = get_metadata().await
         .with_context(|| "Failed to get the metadata")?;
 
