@@ -1,4 +1,4 @@
-use clap::{ArgAction, Subcommand};
+use clap::{ArgAction, ArgGroup, Subcommand};
 
 #[derive(Subcommand)]
 pub enum Commands{
@@ -10,6 +10,11 @@ pub enum Commands{
         extended: bool,
     },
 
+    #[command(group(
+        ArgGroup::new("list_item")
+            .required(true)
+            .args(["java", "boot", "project_type", "language", "deps"]),
+    ))]
     List {
         #[arg(short = 'j', long, action = ArgAction::SetTrue)]
         java: bool,

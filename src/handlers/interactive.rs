@@ -125,7 +125,7 @@ pub async fn quick_interactivity(maven: bool, extended: bool) -> Result<QueryPar
     let mut description: Option<String> = None;
     let mut project_type = spring_metadata.project_type.default;
 
-    if extended {
+    if !extended {
         let _name = Text::new("Project Name:")
             .with_help_message("This will be the display name for your project")
             .prompt()

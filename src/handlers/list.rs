@@ -2,7 +2,7 @@ use std::io::{BufWriter, Write};
 use anyhow::{anyhow, Context, Result};
 use crate::{client::spring_initializr::get_metadata, models::list::Lists::{self, Categories, Values}};
 
-pub async fn get_versions(item: &str) -> Result<Lists>{
+pub async fn get_lists(item: &str) -> Result<Lists>{
     let spring_metadata = get_metadata().await
         .with_context(|| "Failed to get metadata for listing out versions")?;
 
