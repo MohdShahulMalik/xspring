@@ -6,7 +6,8 @@ use xspring::cli::commands::Commands;
 use xspring::cli::root::Cli;
 use xspring::handlers::interactive::{pure_interactivity, quick_interactivity};
 use tracing_appender::rolling;
-use xspring::handlers::list::{get_versions, print_versions, Lists};
+use xspring::handlers::list::{get_versions, print_values};
+use xspring::models::list::Lists;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
@@ -36,7 +37,7 @@ async fn main() -> Result<()> {
                     .with_context(|| "Failed to get java versions")?;  
                 writeln!(buf, "Available Java Versions:");
 
-                print_versions(&mut buf, java_versions)
+                print_values(&mut buf, java_versions)
                  .with_context(|| "Failed to print java versions")?;
                 
            }
@@ -46,9 +47,28 @@ async fn main() -> Result<()> {
                    .with_context(|| "Failed to get boot version")?;
                writeln!(buf, "Available Spring Boot Versions:");
 
-               print_versions(&mut buf, boot_versions)
+               print_values(&mut buf, boot_versions)
                    .with_context(|| "Failed to print boot versions")?;
            }
+
+           Commands::List { project_type: true, .. } => {
+               let project_types: Lists = get_versions("project_type").await
+                   .with_context(|| "Failed to get project types")?;
+               writeln!(buf, "Available Project Types:")?;
+
+               print_values(&mut buf, project_types)
+                   .with_context(|| "Failed to print project types")?;
+           }
+
+           Commands::List { language: true, .. } => {
+               let languages = get_versions("language").await
+                   .with_context(|| "Failed to get languages")?;
+               writeln!(buf, "Available Languages:")?;
+
+               print_values(&mut buf, languages)
+                   .with_context(|| "Failed to print languages")?;
+           }
+
         }
     }
     
