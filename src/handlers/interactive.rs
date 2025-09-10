@@ -14,7 +14,6 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
         .with_context(|| "Failed to get input for Project Type")?;
     debug!("Project type: {:?}", project_type);
 
-
     let languages = spring_metadata.language.values;
     let language = Select::new("Language:", languages)
         .with_help_message("Choose the programming language for your project")
@@ -37,26 +36,30 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
     debug!("Selected Boot Version: {:?}", boot_version);
     debug!("Select Boot Version Id: {:?}", boot_version.id);
     
+    // TODO: ADD VALIDATORS TO THE BELOW FIELD FOR REQUIRED AND NO SPACES
     let group_id = Text::new("Group ID:")
         .with_help_message("e.g. com.example")
         .prompt()
         .with_context(|| "Failed to get input for Group ID")?;
     debug!("Group ID: {}", group_id);
 
+    // TODO: ADD VALIDATORS TO THE BELOW FIELD FOR REQUIRED AND NO SPACES
     let artifact_id = Text::new("Artifact ID:")
         .with_help_message("e.g. my-awesome-project")
         .prompt()
         .with_context(|| "Failed to get input for Artifact ID")?;
     debug!("Artifact ID: {}", artifact_id);
 
-    let name = Text::new("Project Name:")
+    let name = Text::new("Display Name:")
         .with_help_message("This will be the display name for your project")
+        .with_default(&spring_metadata.name.default)
         .prompt()
         .with_context(|| "Failed to get input for Project Name")?;
     debug!("Project Name Choice: {}", name);
 
     let description = Text::new("Project Description:")
         .with_help_message("A brief description of your project.")
+        .with_default(&spring_metadata.description.default)
         .prompt()
         .with_context(|| "Failed to get input for Description")?;
     debug!("Project Description Choice: {}", description);
