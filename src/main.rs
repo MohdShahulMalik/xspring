@@ -1,9 +1,10 @@
+use std::env::current_dir;
 use std::io::{stdout, BufWriter, Write};
-
 use clap::Parser;
 use anyhow::{anyhow, Context, Result};
 use xspring::cli::commands::Commands;
 use xspring::cli::root::Cli;
+use xspring::client::spring_initializr::generate_project;
 use xspring::handlers::interactive::{pure_interactivity, quick_interactivity};
 use tracing_appender::rolling;
 use xspring::handlers::list::{get_lists, print_categories, print_values};
@@ -20,6 +21,7 @@ async fn main() -> Result<()> {
         .with_writer(logfile)
         .with_ansi(true)
         .init();
+    let out_dir = cli.output.unwrap_or(current_dir()?);
 
     if let Some(command) = cli.command {
 
@@ -29,8 +31,10 @@ async fn main() -> Result<()> {
 
         match command {
            Commands::Quick {maven, extended} => {
-               quick_interactivity(maven, extended).await
+               let query_params = quick_interactivity(maven, extended).await
                    .with_context(|| "Failed to run quick interactivity")?;
+               generate_project(query_params, out_dir).await
+                   .with_context(|| "Failed to generate a spring boot project")?;
            }
 
            Commands::List { java: true, .. } => {
@@ -86,9 +90,12 @@ async fn main() -> Result<()> {
         }
 
     } else {
-        pure_interactivity().await
+        let query_params = pure_interactivity().await
             .with_context(|| "Failed to run pure interactivity")?;
+        generate_project(query_params, out_dir).await
+            .with_context(|| "Failed to generate a spring boot project")?;
     }
+
     
     Ok(())
 }

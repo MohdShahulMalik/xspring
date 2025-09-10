@@ -18,6 +18,7 @@ pub struct InitializrMetadata {
 #[derive(Serialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct QueryParam {
+    #[serde(rename = "type")]
     pub project_type: String,
     pub language: String,
     pub boot_version: String,

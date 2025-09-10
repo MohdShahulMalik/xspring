@@ -35,6 +35,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
         .prompt()
         .with_context(|| "Failed to get input for Spring Boot Version")?;
     debug!("Selected Boot Version: {:?}", boot_version);
+    debug!("Select Boot Version Id: {:?}", boot_version.id);
     
     let group_id = Text::new("Group ID:")
         .with_help_message("e.g. com.example")
@@ -92,7 +93,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
     Ok(QueryParam {
         project_type: project_type.id.clone(),
         language: language.id.clone(),
-        boot_version: boot_version.id.clone(),
+        boot_version: boot_version.id.replace(".RELEASE", "").replace(".BUILD-SNAPSHOT", "-SNAPSHOT").replace(".M", "-M").replace(".RC", "-RC"),
         group_id ,
         artifact_id: artifact_id.clone(),
         name,
@@ -149,7 +150,7 @@ pub async fn quick_interactivity(maven: bool, extended: bool) -> Result<QueryPar
     Ok(QueryParam {
         project_type,
         language: spring_metadata.language.default,
-        boot_version: spring_metadata.boot_version.default,
+        boot_version: spring_metadata.boot_version.default.replace(".RELEASE", "").replace(".M", "-M").replace(".RC", "-RC"),
         group_id,
         artifact_id: artifact_id.clone(),
         name: name.unwrap_or(spring_metadata.name.default),
