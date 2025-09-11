@@ -1,4 +1,4 @@
-use inquire::{Text, Select, MultiSelect};
+use inquire::{required, validator::Validation, MultiSelect, Select, Text, };
 use anyhow::{Context, Result};
 use tracing::{debug, trace};
 use crate::{client::spring_initializr::get_metadata, models::spring::QueryParam};
@@ -6,6 +6,56 @@ use crate::{client::spring_initializr::get_metadata, models::spring::QueryParam}
 pub async fn pure_interactivity() -> Result<QueryParam> {
     let spring_metadata = get_metadata().await?;
     trace!("Spring Metadata: {:?}", spring_metadata);
+
+    let group_id = Text::new("Group ID:")
+        .with_help_message("e.g. com.example")
+        .with_validator(required!())
+        .with_validator(|input: &str| {
+            if input.contains(' ') {
+                Ok(Validation::Invalid("This field's input cannot contain spaces".into()))
+            }else {
+                Ok(Validation::Valid)
+            }
+        })
+        .prompt()
+        .with_context(|| "Failed to get input for Group ID")?;
+    debug!("Group ID: {}", group_id);
+
+    let artifact_id = Text::new("Artifact ID:")
+        .with_help_message("e.g. my-awesome-project")
+        .with_validator(required!())
+        .with_validator(|input: &str| {
+            if input.contains(' ') {
+                Ok(Validation::Invalid("This field's input cannot contain spaces".into()))
+            }else {
+                Ok(Validation::Valid)
+            }
+        })
+        .prompt()
+        .with_context(|| "Failed to get input for Artifact ID")?;
+    debug!("Artifact ID: {}", artifact_id);
+
+    let mut name = Text::new("Display Name:")
+        .with_help_message("This will be the display name for your project")
+        .with_placeholder(&spring_metadata.name.default)
+        .prompt()
+        .with_context(|| "Failed to get input for Project Name")?;
+    debug!("Project Name Choice: {}", name);
+    if name.is_empty() {
+        name = spring_metadata.name.default;
+        debug!("Project Name after replacing the empty string: {}", name);
+    }
+
+    let mut description = Text::new("Project Description:")
+        .with_help_message("A brief description of your project.")
+        .with_placeholder(&spring_metadata.description.default)
+        .prompt()
+        .with_context(|| "Failed to get input for Description")?;
+    debug!("Project Description Choice: {}", description);
+    if description.is_empty() {
+        description = spring_metadata.description.default;
+        debug!("Project description after replacing the empty string: {}", description);
+    }
 
     let project_types = spring_metadata.project_type.values;
     let project_type = Select::new("Project Type:", project_types)
@@ -28,41 +78,14 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
     let temp = boot_versions[default_boot_version_idx].clone();
     boot_versions[default_boot_version_idx] = boot_versions[0].clone();
     boot_versions[0] = temp;
-    
+
     let boot_version = Select::new("Spring Boot Version:", boot_versions)
         .with_help_message("Choose the version of Spring Boot for your project")
         .prompt()
         .with_context(|| "Failed to get input for Spring Boot Version")?;
     debug!("Selected Boot Version: {:?}", boot_version);
     debug!("Select Boot Version Id: {:?}", boot_version.id);
-    
-    // TODO: ADD VALIDATORS TO THE BELOW FIELD FOR REQUIRED AND NO SPACES
-    let group_id = Text::new("Group ID:")
-        .with_help_message("e.g. com.example")
-        .prompt()
-        .with_context(|| "Failed to get input for Group ID")?;
-    debug!("Group ID: {}", group_id);
 
-    // TODO: ADD VALIDATORS TO THE BELOW FIELD FOR REQUIRED AND NO SPACES
-    let artifact_id = Text::new("Artifact ID:")
-        .with_help_message("e.g. my-awesome-project")
-        .prompt()
-        .with_context(|| "Failed to get input for Artifact ID")?;
-    debug!("Artifact ID: {}", artifact_id);
-
-    let name = Text::new("Display Name:")
-        .with_help_message("This will be the display name for your project")
-        .with_default(&spring_metadata.name.default)
-        .prompt()
-        .with_context(|| "Failed to get input for Project Name")?;
-    debug!("Project Name Choice: {}", name);
-
-    let description = Text::new("Project Description:")
-        .with_help_message("A brief description of your project.")
-        .with_default(&spring_metadata.description.default)
-        .prompt()
-        .with_context(|| "Failed to get input for Description")?;
-    debug!("Project Description Choice: {}", description);
 
     let packages = spring_metadata.packaging.values;
     let packaging = Select::new("Package Type:", packages)
