@@ -1,7 +1,7 @@
 use inquire::{required, validator::Validation, MultiSelect, Select, Text, };
 use anyhow::{Context, Result};
 use tracing::{debug, trace};
-use crate::{client::spring_initializr::get_metadata, models::spring::QueryParam};
+use crate::{cli::interactive_ui::base_config, client::spring_initializr::get_metadata, models::spring::QueryParam};
 
 pub async fn pure_interactivity() -> Result<QueryParam> {
     let spring_metadata = get_metadata().await?;
@@ -17,6 +17,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
                 Ok(Validation::Valid)
             }
         })
+        .with_render_config(base_config("📦"))
         .prompt()
         .with_context(|| "Failed to get input for Group ID")?;
     debug!("Group ID: {}", group_id);
@@ -31,6 +32,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
                 Ok(Validation::Valid)
             }
         })
+        .with_render_config(base_config("🎫"))
         .prompt()
         .with_context(|| "Failed to get input for Artifact ID")?;
     debug!("Artifact ID: {}", artifact_id);
@@ -38,6 +40,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
     let mut name = Text::new("Display Name:")
         .with_help_message("This will be the display name for your project")
         .with_placeholder(&spring_metadata.name.default)
+        .with_render_config(base_config("📝"))
         .prompt()
         .with_context(|| "Failed to get input for Project Name")?;
     debug!("Project Name Choice: {}", name);
@@ -49,6 +52,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
     let mut description = Text::new("Project Description:")
         .with_help_message("A brief description of your project.")
         .with_placeholder(&spring_metadata.description.default)
+        .with_render_config(base_config("💡"))
         .prompt()
         .with_context(|| "Failed to get input for Description")?;
     debug!("Project Description Choice: {}", description);
@@ -60,6 +64,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
     let project_types = spring_metadata.project_type.values;
     let project_type = Select::new("Project Type:", project_types)
         .with_help_message("Choose the build system for your project (Maven or Gradle)")
+        .with_render_config(base_config("🧰"))
         .prompt()
         .with_context(|| "Failed to get input for Project Type")?;
     debug!("Project type: {:?}", project_type);
@@ -67,6 +72,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
     let languages = spring_metadata.language.values;
     let language = Select::new("Language:", languages)
         .with_help_message("Choose the programming language for your project")
+        .with_render_config(base_config("💻"))
         .prompt()
         .with_context(|| "Failed to get input for Language")?;
     debug!("Lanuage Choice: {:?}", language);
@@ -81,6 +87,8 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
 
     let boot_version = Select::new("Spring Boot Version:", boot_versions)
         .with_help_message("Choose the version of Spring Boot for your project")
+        .with_render_config(base_config("🚀"))
+
         .prompt()
         .with_context(|| "Failed to get input for Spring Boot Version")?;
     debug!("Selected Boot Version: {:?}", boot_version);
@@ -90,6 +98,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
     let packages = spring_metadata.packaging.values;
     let packaging = Select::new("Package Type:", packages)
         .with_help_message("Choose how your project will be packaged")
+        .with_render_config(base_config("🎁"))
         .prompt()
         .with_context(|| "Failed to get input for Package Type")?;
     debug!("Project Packaging Choice: {:?}", packaging);
@@ -100,6 +109,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
     java_versions.swap(0, default_java_version_idx);
     let java_version = Select::new("Java Version", java_versions)
         .with_help_message("Select java version for your project")
+        .with_render_config(base_config("☕"))
         .prompt()
         .with_context(|| "Failed to get input for Java Version")?;
     debug!("Select Java Version: {:?}", java_version);
@@ -112,6 +122,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
         .with_page_size(5)
         .with_keep_filter(true)
         .with_help_message("🔍 Type to search • Space to select • ↑↓ to navigate • Enter to confirm")
+        .with_render_config(base_config("🧩"))
         .prompt()
         .with_context(|| "Failed to get input for Dependencies")?;
     debug!("Selected Dependencies: {:?}", dependencies);
