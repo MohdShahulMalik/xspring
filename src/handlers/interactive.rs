@@ -148,24 +148,50 @@ pub async fn quick_interactivity(maven: bool, extended: bool) -> Result<QueryPar
 
     let group_id: String = Text::new("Group ID:")
         .with_help_message("e.g. com.example")
+        .with_validator(required!())
+        .with_validator(|input: &str| {
+            if input.contains(' ') {
+                Ok(Validation::Invalid("This field's input cannot contain spaces".into()))
+            }else {
+                Ok(Validation::Valid)
+            }
+        })
+        .with_render_config(base_config("📦"))
         .prompt()
         .with_context(|| "Failed to get input for Group ID")?;
     debug!("Group ID: {}", group_id);
 
     let artifact_id = Text::new("Artifact ID:")
         .with_help_message("e.g. my-awesome-project")
+        .with_validator(required!())
+        .with_validator(|input: &str| {
+            if input.contains(' ') {
+                Ok(Validation::Invalid("This field's input cannot contain spaces".into()))
+            }else {
+                Ok(Validation::Valid)
+            }
+        })
+        .with_render_config(base_config("🎫"))
         .prompt()
         .with_context(|| "Failed to get input for Artifact ID")?;
     debug!("Artifact ID: {}", artifact_id);
-
         
     let mut name: Option<String> = None;
     let mut description: Option<String> = None;
     let mut project_type = spring_metadata.project_type.default;
 
     if !extended {
-        let _name = Text::new("Project Name:")
+        let _name = Text::new("Display Name:")
             .with_help_message("This will be the display name for your project")
+            .with_validator(required!())
+            .with_validator(|input: &str| {
+                if input.contains(' ') {
+                    Ok(Validation::Invalid("This field's input cannot contain spaces".into()))
+                }else {
+                    Ok(Validation::Valid)
+                }
+            })
+            .with_render_config(base_config("📝"))
             .prompt()
             .with_context(|| "Failed to get input for Project Name")?;
         name = Some(_name);
@@ -173,6 +199,15 @@ pub async fn quick_interactivity(maven: bool, extended: bool) -> Result<QueryPar
 
         let _description = Text::new("Description:")
             .with_help_message("A brief description of your project.")
+            .with_validator(required!())
+            .with_validator(|input: &str| {
+                if input.contains(' ') {
+                    Ok(Validation::Invalid("This field's input cannot contain spaces".into()))
+                }else {
+                    Ok(Validation::Valid)
+                }
+            })
+            .with_render_config(base_config("💡"))
             .prompt()
             .with_context(|| "Failed to get input for Description")?;
         description = Some(_description);
