@@ -21,13 +21,16 @@ Whether you're a seasoned Spring developer who values automation or a newcomer l
 - **Intelligent Fuzzy-Finding for Dependencies**: Forget memorizing dependency IDs. Simply start typing, and xspring provides a live, filterable list of matching dependencies.
     - Example: Typing `sec` might suggest `Spring Security`.
     - Navigate suggestions with arrow keys and select one or more with the spacebar.
-- **Quick-Interactive Mode for Time Saving**: If you want default features for most of the things then you can use the quick command
-    - use `-e` or `-extended` flag to scaffold a project more quickly
-    - use `-m` or `-maven` if you prefer to change the default project type
+- **Quick-Interactive Mode for Time Saving**: If you want default features for most of the things then you can use the quick subcommand
+    - use `-e` or `--extended` flag to scaffold a project more quickly
+    - use `-m` or `--maven` if you prefer to change the default project type
+    - use `-d` or `--deps` to add dependencies to your project interactively
 - **Discoverability and Exploration**: xspring helps you explore the Spring ecosystem without leaving your terminal.
-    - `xspring list -deps` or `-d`: Browse all available dependencies by category.
-    - `xspring list -b` or `-boot`: See a list of supported Spring Boot versions (stable, milestone, and snapshot).
-    - `xspring list -java` or `-j`: Check the available Java runtimes.
+    - `xspring list --deps` or `-d`: Browse all available dependencies by category.
+    - `xspring list --boot` or `-b`: See a list of supported Spring Boot versions (stable, milestone, and snapshot).
+    - `xspring list --java` or `-j`: Check the available Java runtimes.
+    - `xspring list --type` or `-t`: Check the available project types.
+    - `xspring list --language` or `-l`: Check the available languages.
 
 ## Why Use xspring?
 
@@ -62,6 +65,7 @@ $ xspring
 🚀 Spring Boot Version: › 3.2.1 - 3.1.8 - ...
 🎁 Package Type: › Jar - War
 ☕ Java Version: › 17 - 21 - ...
+🧩 Dependencies: › Spring Security - Spring Web - Lombok - ...
 ```
 
 ### Quick-Interactive Mode
@@ -88,6 +92,19 @@ You can further streamline the process with the `-e` or `--extended` flag, which
 $ xspring quick -e
 📦 Group ID: com.mycorp
 🎫 Artifact ID: user-service
+```
+
+**Dependencies Flag (`-d` or `--deps`)**
+
+The `-d` or `--deps` flag allows you to select dependencies for your project. This can be combined with other flags.
+
+```bash
+$ xspring quick -d
+📦 Group ID: com.mycorp
+🎫 Artifact ID: user-service
+📝 Display Name: User Service
+💡 Project Description: A RESTful API for managing users
+🧩 Dependencies: › Spring Security - Spring Web - Lombok - ...
 ```
 
 **Maven Flag (`-m` or `--maven`)**
