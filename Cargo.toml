@@ -2,6 +2,10 @@
 name = "xspring"
 version = "0.1.0"
 edition = "2024"
+authors = ["Shahul Malik <mohdshahulmalik@gmail.com"]
+license = "MIT OR Apache-2.0"
+description = "A tool to scaffold spring boot projects interactively like the vs code extension for scaffolding a spring boot project"
+readme = "README.md"
 
 [dependencies]
 anyhow = "1.0.99"
