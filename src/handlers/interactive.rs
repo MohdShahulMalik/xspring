@@ -142,7 +142,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
     })
 }
 
-pub async fn quick_interactivity(maven: bool, extended: bool) -> Result<QueryParam>{
+pub async fn quick_interactivity(maven: bool, extended: bool, deps: bool) -> Result<QueryParam>{
     let spring_metadata = get_metadata().await
         .with_context(|| "Failed to get the metadata")?;
 
@@ -178,6 +178,7 @@ pub async fn quick_interactivity(maven: bool, extended: bool) -> Result<QueryPar
         
     let mut name: Option<String> = None;
     let mut description: Option<String> = None;
+    let mut dependencies: Option<String> = None;
     let mut project_type = spring_metadata.project_type.default;
 
     if !extended {
@@ -215,6 +216,30 @@ pub async fn quick_interactivity(maven: bool, extended: bool) -> Result<QueryPar
       
     }
 
+    if deps {
+        let dependency_names = spring_metadata.dependencies.values
+            .iter()
+            .flat_map(|category| category.values.iter())
+            .collect::<Vec<_>>();
+
+        let dependency_choices = MultiSelect::new("Dependencies", dependency_names)
+            .with_page_size(5)
+            .with_keep_filter(true)
+            .with_help_message("🔍 Type to search • Space to select • ↑↓ to navigate • Enter to confirm")
+            .with_render_config(base_config("🧩"))
+            .prompt()
+            .with_context(|| "Failed to get input for Dependencies")?;
+        debug!("Selected Dependencies: {:?}", dependency_choices);
+
+        let _dependencies = dependency_choices
+            .iter()
+            .map(|dep| dep.id.clone())
+            .collect::<Vec<_>>()
+            .join(",");
+            
+        dependencies = Some(_dependencies);
+    }
+
     if maven {
         project_type = "maven-project".to_string();
     }
@@ -229,7 +254,7 @@ pub async fn quick_interactivity(maven: bool, extended: bool) -> Result<QueryPar
         description: description.unwrap_or(spring_metadata.description.default),
         packaging: spring_metadata.packaging.default,
         java_version: spring_metadata.java_version.default,
-        dependencies: "".to_string(),
+        dependencies: dependencies.unwrap_or("".to_string()),
         base_dir: artifact_id,
     })
 

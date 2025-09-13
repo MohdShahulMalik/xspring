@@ -3,7 +3,7 @@ use clap::Parser;
 use std::path::PathBuf;
 use clap_verbosity_flag::Verbosity;
 
-#[derive(Parser)]
+#[derive(Parser, Debug)]
 #[command(name = "xspring")]
 #[command(version = "1.0")]
 #[command(about = "An interactive Spring Boot project generator")]

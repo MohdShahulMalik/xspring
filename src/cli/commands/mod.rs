@@ -1,6 +1,6 @@
 use clap::{ArgAction, ArgGroup, Subcommand};
 
-#[derive(Subcommand)]
+#[derive(Subcommand, Debug)]
 pub enum Commands{
     Quick{
         #[arg(short = 'm', long, action = ArgAction::SetTrue)]
@@ -8,6 +8,9 @@ pub enum Commands{
 
         #[arg(short = 'e', long, action = ArgAction::SetTrue)]
         extended: bool,
+
+        #[arg(short = 'd', long, action = ArgAction::SetTrue)]
+        deps: bool,
     },
 
     #[command(group(

@@ -6,6 +6,7 @@ use xspring::cli::commands::Commands;
 use xspring::cli::root::Cli;
 use xspring::client::spring_initializr::generate_project;
 use xspring::handlers::interactive::{pure_interactivity, quick_interactivity};
+use tracing::debug;
 use tracing_appender::rolling;
 use xspring::handlers::list::{get_lists, print_categories, print_values};
 use xspring::models::list::Lists;
@@ -13,6 +14,7 @@ use xspring::models::list::Lists;
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
     let cli = Cli::parse();
+    debug!("Parsed cli arguments: {:?}", cli);
 
     let logfile = rolling::daily("logs", "xspring.log");
     let level = cli.verbose.tracing_level_filter();
@@ -30,8 +32,8 @@ async fn main() -> Result<()> {
         let mut buf = BufWriter::new(handle);
 
         match command {
-           Commands::Quick {maven, extended} => {
-               let query_params = quick_interactivity(maven, extended).await
+           Commands::Quick {maven, extended, deps} => {
+               let query_params = quick_interactivity(maven, extended, deps).await
                    .with_context(|| "Failed to run quick interactivity")?;
                generate_project(query_params, out_dir).await
                    .with_context(|| "Failed to generate a spring boot project")?;
