@@ -8,7 +8,7 @@ description = "A tool to scaffold spring boot projects interactively like the vs
 readme = "README.md"
 homepage = "https://github.com/MohdShahulMalik/xspring"
 repository = "https://github.com/MohdShahulMalik/xspring"
-keywords = ["cli", "spring", "spring-boot", "generator", "scaffolding", "interactive"]
+keywords = ["cli", "spring", "spring-boot", "generator", "interactive"]
 categories = ["command-line-utilities", "development-tools::build-utils"]
 
 [dependencies]
