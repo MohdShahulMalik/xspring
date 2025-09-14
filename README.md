@@ -4,7 +4,7 @@
 [![Docs.rs](https://docs.rs/xspring/badge.svg)](https://docs.rs/xspring)
 [![License: MIT OR Apache-2.0](https://img.shields.io/crates/l/xspring.svg)](https://opensource.org/licenses/MIT)
 
-**xspring** is a powerful, modern command-line interface (CLI) for creating and configuring Spring Boot applications. Built for speed, ease of use, and developer productivity, xspring provides an interactive, guided experience that streamlines project setup, from simple web applications to complex microservices. It combines the flexibility of the official Spring Initializr with the convenience of a fast, local, and feature-rich tool.
+**xspring** is a powerful, modern command-line interface (CLI) for creating and configuring Spring Boot applications. Built for ease of use and developer productivity while levaraging the speed of Rust, xspring provides an interactive, guided experience that streamlines project setup, from simple web applications to complex microservices. It combines the flexibility of the official Spring Initializr with the convenience of a fast, local, and feature-rich tool.
 
 Whether you're a seasoned Spring developer who values automation or a newcomer learning the ecosystem, xspring is designed to get you from idea to `public static void main` in seconds.
 
