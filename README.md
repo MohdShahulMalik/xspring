@@ -125,13 +125,22 @@ $ xspring quick -e -m
 - **List Project Types(Ex. Maven)**: `xspring list -t` or `xspring list --type`
 - **List Languages**: `xspring list -l` or `xspring list --language`
 
-### Global Options
+### Output Directory
 
 - `-o` or `--output`: Specify a directory to output the generated project to.
 
   ```bash
   xspring -o my-new-project
   ```
+
+### Logging
+
+`xspring` creates daily rotating log files in a `logs` directory in the directory where it is executed.
+
+You can control the log verbosity with the following flags:
+
+- `-v, --verbose`: Increases the verbosity of the output. Can be used multiple times to increase the level of detail (e.g., `-v` for warnings, `-vv` for info, `-vvv` for debug, `-vvvv` for trace).
+- `-q, --quiet`: Suppresses all output except for errors.
 
 ## Building from Source
 
