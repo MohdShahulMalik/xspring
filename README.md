@@ -18,10 +18,10 @@ Whether you're a seasoned Spring developer who values automation or a newcomer l
     - Packaging (Jar or War)
     - Java version
     - Dependencies
-- **Intelligent Fuzzy-Finding for Dependencies**: Forget memorizing dependency IDs. Simply start typing, and xspring provides a live, filterable list of matching dependencies.
+- **Intelligent Fuzzy-Finding**: Forget memorizing exact option names. Simply start typing to filter through choices for dependencies, Spring Boot versions, languages, and more.
     - Example: Typing `sec` might suggest `Spring Security`.
-    - Navigate suggestions with arrow keys and select one or more with the spacebar.
-- **Quick-Interactive Mode for Time Saving**: If you want default features for most of the things then you can use the quick subcommand
+    - Navigate suggestions with arrow keys and select your desired thing.
+- **Accelerated Setup With Quick Interactivity**: Use the `quick` subcommand for a faster, streamlined project setup with sensible defaults.
     - use `-e` or `--extended` flag to scaffold a project more quickly
     - use `-m` or `--maven` if you prefer to change the default project type
     - use `-d` or `--deps` to add dependencies to your project interactively
@@ -143,11 +143,11 @@ $ xspring quick -e -m
     ```bash
     cd xspring
     ```
-3.  Build the project:
+3.  Install the project:
     ```bash
-    cargo build --release
+    cargo install --path .
     ```
-4.  The executable will be in `target/release/xspring`.
+4.  The executable will be in `~/.cargo/bin/xspring`.
 
 ## License
 
