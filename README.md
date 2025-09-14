@@ -125,6 +125,14 @@ $ xspring quick -e -m
 - **List Project Types(Ex. Maven)**: `xspring list -t` or `xspring list --type`
 - **List Languages**: `xspring list -l` or `xspring list --language`
 
+```bash
+# List all available dependencies
+$ xspring list --deps
+
+# List all supported Java versions
+$ xspring list --java
+```
+
 ### Output Directory
 
 - `-o` or `--output`: Specify a directory to output the generated project to.
@@ -141,6 +149,14 @@ You can control the log verbosity with the following flags:
 
 - `-v, --verbose`: Increases the verbosity of the output. Can be used multiple times to increase the level of detail (e.g., `-v` for warnings, `-vv` for info, `-vvv` for debug, `-vvvv` for trace).
 - `-q, --quiet`: Suppresses all output except for errors.
+
+```bash
+# Run with verbose output to show debug information
+$ xspring -vvv
+
+# Run in quiet mode
+$ xspring --quiet
+```
 
 ## Building from Source
 
