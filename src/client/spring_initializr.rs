@@ -44,7 +44,9 @@ pub async fn generate_project(params: QueryParam, out_dir: PathBuf) -> Result<()
     let mut archive = ZipArchive::new(cursor)?;
     archive.extract(&out_dir)?;
 
-    info!("Successfully Generated a Spring Boot project file at {:?}", out_dir);
+    let project_dir = out_dir.join(params.base_dir);
+    info!("Successfully Generated a Spring Boot project folder at {:?}", project_dir);
+    println!("Successfully Generated a Spring Boot project folder at {:?}", project_dir);
 
     Ok(())
 }
