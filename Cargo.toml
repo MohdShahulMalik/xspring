@@ -37,9 +37,6 @@ lto = "thin"
 
 [workspace]
 resolver = "2"
-members = [
-    "xspring",
-]
 
 # All GLOBAL settings go here in the workspace section
 [workspace.metadata.dist]
