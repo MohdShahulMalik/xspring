@@ -116,6 +116,7 @@ jobs:
       - name: enable windows longpaths
         run: |
           git config --global core.longpaths true
+          cargo install cargo-xwin --force
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
