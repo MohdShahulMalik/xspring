@@ -21,3 +21,5 @@ install-path = "CARGO_HOME"
 publish-jobs = ["homebrew"]
 # Whether to install an updater program
 install-updater = false
+# Add this line to clear the cache before building
+pre-build-hook = "cargo xwin cache clear && rm -rf ~/.cache/cargo-xwin"
