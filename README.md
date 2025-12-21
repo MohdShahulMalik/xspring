@@ -54,19 +54,7 @@ cargo install xspring
 
 Run `xspring` with no arguments to enter the interactive mode:
 
-```bash
-$ xspring
-📦 Group ID: com.mycorp
-🎫 Artifact ID: user-service
-📝 Display Name: User Service
-💡 Project Description: A RESTful API for managing users
-🧰 Project Type: › Maven - Gradle -  ...
-💻 Language: › Java - Kotlin - Groovy
-🚀 Spring Boot Version: › 3.2.1 - 3.1.8 - ...
-🎁 Package Type: › Jar - War
-☕ Java Version: › 17 - 21 - ...
-🧩 Dependencies: › Spring Security - Spring Web - Lombok - ...
-```
+https://github.com/user-attachments/assets/bd81382f-f7f5-406d-b36e-06b31715eaf7
 
 ### Quick-Interactive Mode
 
