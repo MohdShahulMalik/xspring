@@ -107,7 +107,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
     let default_java_version = spring_metadata.java_version.default;
     let default_java_version_idx = java_versions.iter().position(|v| v.id == default_java_version).unwrap_or(0);
     java_versions.swap(0, default_java_version_idx);
-    let java_version = Select::new("Java Version", java_versions)
+    let java_version = Select::new("Java Version:", java_versions)
         .with_help_message("Select java version for your project")
         .with_render_config(base_config("☕"))
         .prompt()
@@ -118,7 +118,7 @@ pub async fn pure_interactivity() -> Result<QueryParam> {
         .flat_map(|category| category.values.iter())
         .collect();
     trace!("All Dependency Names: {:?}", dependency_names);
-    let dependencies = MultiSelect::new("Dependencies", dependency_names)   
+    let dependencies = MultiSelect::new("Dependencies:", dependency_names)   
         .with_page_size(5)
         .with_keep_filter(true)
         .with_help_message("🔍 Type to search • Space to select • ↑↓ to navigate • Enter to confirm")
@@ -184,14 +184,6 @@ pub async fn quick_interactivity(maven: bool, extended: bool, deps: bool) -> Res
     if !extended {
         let _name = Text::new("Display Name:")
             .with_help_message("This will be the display name for your project")
-            .with_validator(required!())
-            .with_validator(|input: &str| {
-                if input.contains(' ') {
-                    Ok(Validation::Invalid("This field's input cannot contain spaces".into()))
-                }else {
-                    Ok(Validation::Valid)
-                }
-            })
             .with_render_config(base_config("📝"))
             .prompt()
             .with_context(|| "Failed to get input for Project Name")?;
@@ -200,14 +192,6 @@ pub async fn quick_interactivity(maven: bool, extended: bool, deps: bool) -> Res
 
         let _description = Text::new("Description:")
             .with_help_message("A brief description of your project.")
-            .with_validator(required!())
-            .with_validator(|input: &str| {
-                if input.contains(' ') {
-                    Ok(Validation::Invalid("This field's input cannot contain spaces".into()))
-                }else {
-                    Ok(Validation::Valid)
-                }
-            })
             .with_render_config(base_config("💡"))
             .prompt()
             .with_context(|| "Failed to get input for Description")?;
