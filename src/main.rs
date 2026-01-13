@@ -2,6 +2,7 @@ use std::env::current_dir;
 use std::io::{stdout, BufWriter, Write};
 use clap::Parser;
 use anyhow::{anyhow, Context, Result};
+use tracing::level_filters::LevelFilter;
 use xspring::cli::commands::Commands;
 use xspring::cli::root::Cli;
 use xspring::client::spring_initializr::generate_project;
@@ -16,13 +17,17 @@ async fn main() -> Result<()> {
     let cli = Cli::parse();
     debug!("Parsed cli arguments: {:?}", cli);
 
-    let logfile = rolling::daily("logs", "xspring.log");
     let level = cli.verbose.tracing_level_filter();
-    tracing_subscriber::fmt()
-        .with_max_level(level)
-        .with_writer(logfile)
-        .with_ansi(true)
-        .init();
+
+    if level > LevelFilter::ERROR {
+        let logfile = rolling::daily("logs", "xspring.log");
+        tracing_subscriber::fmt()
+            .with_max_level(level)
+            .with_writer(logfile)
+            .with_ansi(true)
+            .init();
+    }
+    
     let out_dir = cli.output.unwrap_or(current_dir()?);
 
     if let Some(command) = cli.command {
