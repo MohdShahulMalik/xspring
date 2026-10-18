@@ -44,10 +44,10 @@ async fn main() -> Result<()> {
                    .with_context(|| "Failed to generate a spring boot project")?;
            }
 
-           Commands::Add { deps, pick } => {
-               add_deps(&root_dir, deps, pick).await
-                   .with_context(|| "Failed to add dependencies")?;
-           }
+            Commands::Add { deps, pick } => {
+                add_deps(&root_dir, deps, pick).await
+                    .with_context(|| "Failed to add dependencies")?;
+            }
 
            Commands::List { java: true, .. } => {
                 let java_versions: Lists = get_lists("java").await
@@ -104,7 +104,7 @@ async fn main() -> Result<()> {
     } else {
         let query_params = pure_interactivity().await
             .with_context(|| "Failed to run pure interactivity")?;
-        generate_project(query_params, out_dir).await
+        generate_project(query_params, root_dir).await
             .with_context(|| "Failed to generate a spring boot project")?;
     }
 
