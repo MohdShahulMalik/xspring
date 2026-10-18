@@ -4,7 +4,7 @@ use clap::Parser;
 use anyhow::{anyhow, Context, Result};
 use tracing::level_filters::LevelFilter;
 use xspring::cli::commands::Commands;
-use xspring::cli::root::Cli;
+use xspring::cli::root::{self, Cli};
 use xspring::client::spring_initializr::generate_project;
 use xspring::handlers::interactive::{pure_interactivity, quick_interactivity};
 use tracing::debug;
@@ -28,7 +28,7 @@ async fn main() -> Result<()> {
             .init();
     }
     
-    let out_dir = cli.output.unwrap_or(current_dir()?);
+    let root_dir = cli.output.unwrap_or(current_dir()?);
 
     if let Some(command) = cli.command {
 
@@ -40,8 +40,13 @@ async fn main() -> Result<()> {
            Commands::Quick {maven, extended, deps} => {
                let query_params = quick_interactivity(maven, extended, deps).await
                    .with_context(|| "Failed to run quick interactivity")?;
-               generate_project(query_params, out_dir).await
+               generate_project(query_params, root_dir).await
                    .with_context(|| "Failed to generate a spring boot project")?;
+           }
+
+           Commands::Add { deps, pick } => {
+               add_deps(&root_dir, deps, pick).await
+                   .with_context(|| "Failed to add dependencies")?;
            }
 
            Commands::List { java: true, .. } => {

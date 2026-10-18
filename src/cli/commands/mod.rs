@@ -13,6 +13,14 @@ pub enum Commands{
         deps: bool,
     },
 
+    Add{
+        #[arg(short = 'd', long, value_delimiter = ',')]
+        deps: Vec<String>,
+
+        #[arg(short = 'p', long)]
+        pick: bool,
+    },
+
     #[command(group(
         ArgGroup::new("list_item")
             .required(true)
