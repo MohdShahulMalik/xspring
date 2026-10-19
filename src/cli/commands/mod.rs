@@ -13,12 +13,9 @@ pub enum Commands{
         deps: bool,
     },
 
-    Add{
+    Add {
         #[arg(short = 'd', long, value_delimiter = ',')]
-        deps: Vec<String>,
-
-        #[arg(short = 'p', long)]
-        pick: bool,
+        deps: Option<Vec<String>>,
     },
 
     #[command(group(

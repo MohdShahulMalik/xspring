@@ -4,9 +4,10 @@ use clap::Parser;
 use anyhow::{anyhow, Context, Result};
 use tracing::level_filters::LevelFilter;
 use xspring::cli::commands::Commands;
-use xspring::cli::root::{self, Cli};
+use xspring::cli::root::Cli;
 use xspring::client::spring_initializr::generate_project;
-use xspring::handlers::interactive::{pure_interactivity, quick_interactivity};
+use xspring::handlers::interactive::{pick_dependencies, pure_interactivity, quick_interactivity};
+use xspring::handlers::add::add_deps;
 use tracing::debug;
 use tracing_appender::rolling;
 use xspring::handlers::list::{get_lists, print_categories, print_values};
@@ -44,8 +45,13 @@ async fn main() -> Result<()> {
                    .with_context(|| "Failed to generate a spring boot project")?;
            }
 
-            Commands::Add { deps, pick } => {
-                add_deps(&root_dir, deps, pick).await
+            Commands::Add { deps } => {
+                let deps = match deps {
+                    Some(d) if !d.is_empty() => d,
+                    _ => pick_dependencies().await
+                        .with_context(|| "Failed to pick dependencies interactively")?,
+                };
+                add_deps(&root_dir, deps).await
                     .with_context(|| "Failed to add dependencies")?;
             }
 
