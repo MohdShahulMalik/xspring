@@ -52,9 +52,12 @@ pub struct MetadataValue {
     pub values: Vec<Value>,
 }
 
+/// `name`/`description` from the Initializr's basic section. The API no
+/// longer always includes a `default` for these, so it's optional; callers
+/// fall back to fixed placeholder text.
 #[derive(Deserialize, Debug)]
 pub struct DefaultText {
-    pub default: String,
+    pub default: Option<String>,
 }
 
 #[derive(Deserialize, Debug, Clone)]
