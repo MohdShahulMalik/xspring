@@ -7,6 +7,7 @@ pub enum GradleScope {
     DevelopmentOnly,
 }
 
+#[derive(Debug)]
 pub struct Dep {
     pub group: &'static str,
     pub artifact: &'static str,
@@ -233,6 +234,6 @@ pub static DEPS: &[(&str, Dep)] = &[
     ("yaml",   Dep { group: "org.springframework.boot", artifact: "spring-boot-starter-yaml", gradle_scope: GradleScope::Implementation, maven_optional: false }),
 ];
 
-pub fn lookup(id: &str) -> Option<&'static Dep> {
-    DEPS.iter().find(|(k, _)| *k == id).map(|(_, v)| v)
+pub fn lookup(id: &str) -> Option<(&'static str, &'static Dep)> {
+    DEPS.iter().find(|(k, _)| *k == id).map(|(k, v)| (*k, v))
 }
