@@ -1,32 +1,32 @@
 use std::env::current_dir;
 use std::io::{stdout, BufWriter, Write};
+use std::time::Instant;
+
 use clap::Parser;
 use anyhow::{anyhow, Context, Result};
-use tracing::level_filters::LevelFilter;
 use xspring::cli::commands::Commands;
+use xspring::cli::logging::init as init_tracing;
 use xspring::cli::root::Cli;
 use xspring::client::spring_initializr::generate_project;
 use xspring::handlers::interactive::{pick_dependencies, pure_interactivity, quick_interactivity};
 use xspring::handlers::add::add_deps;
-use tracing::debug;
-use tracing_appender::rolling;
+use tracing::{debug, info};
 use xspring::handlers::list::{get_lists, print_categories, print_values};
 use xspring::models::list::Lists;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
+    let started = Instant::now();
+
     let cli = Cli::parse();
-    debug!("Parsed cli arguments: {:?}", cli);
     let level = cli.verbose.tracing_level_filter();
 
-    if level > LevelFilter::ERROR {
-        let logfile = rolling::daily("logs", "xspring.log");
-        tracing_subscriber::fmt()
-            .with_max_level(level)
-            .with_writer(logfile)
-            .with_ansi(true)
-            .init();
-    }
+    // The subscriber has to be installed before anything is logged, otherwise
+    // the first (and most interesting) events are silently dropped.
+    init_tracing(level);
+
+    debug!("Parsed cli arguments: {:?}", cli);
+    info!("xspring: command {:?}", cli.command);
 
     let root_dir = cli.output.unwrap_or(current_dir()?);
 
@@ -112,6 +112,8 @@ async fn main() -> Result<()> {
         generate_project(query_params, root_dir).await
             .with_context(|| "Failed to generate a spring boot project")?;
     }
+
+    info!("xspring: finished in {:?}", started.elapsed());
 
     Ok(())
 }
