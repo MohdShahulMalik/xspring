@@ -69,7 +69,7 @@
 
         <Package Id='*'
             Keywords='Installer'
-            Description='A tool to scaffold spring boot projects interactively like the vs code extension for scaffolding a spring boot project'
+            Description='Interactive CLI to scaffold Spring Boot projects and add dependencies to existing ones — the terminal companion to start.spring.io'
             Manufacturer='Shahul Malik &lt;mohdshahulmalik@gmail.com'
             InstallerVersion='450'
             Languages='1033'
