@@ -1,15 +1,15 @@
 [package]
 name = "xspring"
-version = "0.1.3"
+version = "0.2.0"
 edition = "2024"
 rust-version = "1.88"
 authors = ["Shahul Malik <mohdshahulmalik@gmail.com"]
 license = "MIT OR Apache-2.0"
-description = "A tool to scaffold spring boot projects interactively like the vs code extension for scaffolding a spring boot project"
+description = "Interactive CLI to scaffold Spring Boot projects and add dependencies to existing ones — the terminal companion to start.spring.io"
 readme = "README.md"
 homepage = "https://github.com/MohdShahulMalik/xspring"
 repository = "https://github.com/MohdShahulMalik/xspring"
-keywords = ["cli", "spring", "spring-boot", "generator", "interactive"]
+keywords = ["cli", "spring", "spring-boot", "generator", "dependencies"]
 categories = ["command-line-utilities", "development-tools::build-utils"]
 
 [package.metadata.wix]
