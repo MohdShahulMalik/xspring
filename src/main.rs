@@ -17,7 +17,6 @@ use xspring::models::list::Lists;
 async fn main() -> Result<()> {
     let cli = Cli::parse();
     debug!("Parsed cli arguments: {:?}", cli);
-
     let level = cli.verbose.tracing_level_filter();
 
     if level > LevelFilter::ERROR {
@@ -28,7 +27,7 @@ async fn main() -> Result<()> {
             .with_ansi(true)
             .init();
     }
-    
+
     let root_dir = cli.output.unwrap_or(current_dir()?);
 
     if let Some(command) = cli.command {
@@ -39,11 +38,11 @@ async fn main() -> Result<()> {
 
         match command {
            Commands::Quick {maven, extended, deps} => {
-               let query_params = quick_interactivity(maven, extended, deps).await
-                   .with_context(|| "Failed to run quick interactivity")?;
-               generate_project(query_params, root_dir).await
-                   .with_context(|| "Failed to generate a spring boot project")?;
-           }
+                let query_params = quick_interactivity(maven, extended, deps).await
+                    .with_context(|| "Failed to run quick interactivity")?;
+                generate_project(query_params, root_dir).await
+                    .with_context(|| "Failed to generate a spring boot project")?;
+            }
 
             Commands::Add { deps } => {
                 let deps = match deps {
@@ -57,54 +56,54 @@ async fn main() -> Result<()> {
 
            Commands::List { java: true, .. } => {
                 let java_versions: Lists = get_lists("java").await
-                    .with_context(|| "Failed to get java versions")?;  
+                    .with_context(|| "Failed to get java versions")?;
                 writeln!(&mut buf, "Available Java Versions:")?;
 
                 print_values(&mut buf, java_versions)
                  .with_context(|| "Failed to print java versions")?;
                 
-           }
+            }
 
            Commands::List { boot: true, .. } => {
-               let boot_versions: Lists = get_lists("boot").await
-                   .with_context(|| "Failed to get boot version")?;
-               writeln!(&mut buf, "Available Spring Boot Versions:")?;
+                let boot_versions: Lists = get_lists("boot").await
+                    .with_context(|| "Failed to get boot version")?;
+                writeln!(&mut buf, "Available Spring Boot Versions:")?;
 
-               print_values(&mut buf, boot_versions)
-                   .with_context(|| "Failed to print boot versions")?;
-           }
+                print_values(&mut buf, boot_versions)
+                    .with_context(|| "Failed to print boot versions")?;
+            }
 
            Commands::List { project_type: true, .. } => {
-               let project_types: Lists = get_lists("project_type").await
-                   .with_context(|| "Failed to get project types")?;
-               writeln!(&mut buf, "Available Project Types:")?;
+                let project_types: Lists = get_lists("project_type").await
+                    .with_context(|| "Failed to get project types")?;
+                writeln!(&mut buf, "Available Project Types:")?;
 
-               print_values(&mut buf, project_types)
-                   .with_context(|| "Failed to print project types")?;
-           }
+                print_values(&mut buf, project_types)
+                    .with_context(|| "Failed to print project types")?;
+            }
 
            Commands::List { language: true, .. } => {
-               let languages = get_lists("language").await
-                   .with_context(|| "Failed to get languages")?;
-               writeln!(&mut buf, "Available Languages:")?;
+                let languages = get_lists("language").await
+                    .with_context(|| "Failed to get languages")?;
+                writeln!(&mut buf, "Available Languages:")?;
 
-               print_values(&mut buf, languages)
-                   .with_context(|| "Failed to print languages")?;
-           }
+                print_values(&mut buf, languages)
+                    .with_context(|| "Failed to print languages")?;
+            }
 
            Commands::List { deps: true, ..  } => {
-               let categories = get_lists("deps").await
-                   .with_context(|| "Failed to get dependencies")?;
-               writeln!(&mut buf, "Available Dependencies:-")?;
-               writeln!(&mut buf, " ")?;
+                let categories = get_lists("deps").await
+                    .with_context(|| "Failed to get dependencies")?;
+                writeln!(&mut buf, "Available Dependencies:-")?;
+                writeln!(&mut buf, " ")?;
 
-               print_categories(&mut buf, categories)
-                   .with_context(|| "Failed to print Dependencies with Categories")?;
-           }
+                print_categories(&mut buf, categories)
+                    .with_context(|| "Failed to print Dependencies with Categories")?;
+            }
 
-           _ => {
-               return Err(anyhow!("Invalid or unimplemented command. Please use '--help' or '-h' to see available commands."));
-           }
+            _ => {
+                return Err(anyhow!("Invalid or unimplemented command. Please use '--help' or '-h' to see available commands."));
+            }
         }
 
     } else {
@@ -114,6 +113,5 @@ async fn main() -> Result<()> {
             .with_context(|| "Failed to generate a spring boot project")?;
     }
 
-    
     Ok(())
 }
