@@ -1,6 +1,6 @@
 use inquire::{required, validator::Validation, MultiSelect, Select, Text};
 use anyhow::{Context, Result};
-use tracing::{debug, trace};
+use tracing::{debug, info, trace};
 
 use crate::models::spring::InitializrMetadata;
 use crate::{cli::interactive_ui::base_config, client::spring_initializr::get_metadata, models::spring::QueryParam};
@@ -82,6 +82,10 @@ pub async fn interactive(config: InteractiveConfig) -> Result<QueryParam> {
         .await
         .with_context(|| "Failed to get the metadata")?;
     trace!("Spring Metadata: {:?}", spring_metadata);
+    info!(
+        "interactive: full={}, name_description={}, deps={}, maven={}",
+        config.full, config.name_description, config.deps, config.maven
+    );
 
     // ------------------------------------------------------------------
     // Shared prompts: group id + artifact id (always required)
