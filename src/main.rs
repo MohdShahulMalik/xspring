@@ -7,18 +7,19 @@ use clap::Parser;
 use tracing::{debug, info};
 use xspring::cli::commands::Commands;
 use xspring::cli::logging::init as init_tracing;
-use xspring::cli::root::Cli;
+use xspring::cli::root::{Cli, expand_aliases};
 use xspring::client::spring_initializr::generate_project;
 use xspring::handlers::add::add_deps;
 use xspring::handlers::interactive::{pick_dependencies, pure_interactivity, quick_interactivity};
 use xspring::handlers::list::{get_lists, print_categories, print_values};
 use xspring::models::list::Lists;
+use xspring::scaffold::finalize as finalize_project;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() -> Result<()> {
     let started = Instant::now();
 
-    let cli = Cli::parse();
+    let cli = Cli::parse_from(expand_aliases(std::env::args_os()));
     let level = cli.verbose.tracing_level_filter();
 
     // The subscriber has to be installed before anything is logged, otherwise
@@ -44,9 +45,11 @@ async fn main() -> Result<()> {
                 let query_params = quick_interactivity(maven, extended, deps)
                     .await
                     .with_context(|| "Failed to run quick interactivity")?;
-                generate_project(query_params, root_dir)
+                let project_dir = generate_project(query_params, root_dir)
                     .await
                     .with_context(|| "Failed to generate a spring boot project")?;
+                finalize_project(&project_dir, !cli.no_git)
+                    .with_context(|| "Failed to prepare the generated project")?;
             }
 
             Commands::Add { deps } => {
@@ -123,9 +126,11 @@ async fn main() -> Result<()> {
         let query_params = pure_interactivity()
             .await
             .with_context(|| "Failed to run pure interactivity")?;
-        generate_project(query_params, root_dir)
+        let project_dir = generate_project(query_params, root_dir)
             .await
             .with_context(|| "Failed to generate a spring boot project")?;
+        finalize_project(&project_dir, !cli.no_git)
+            .with_context(|| "Failed to prepare the generated project")?;
     }
 
     info!("xspring: finished in {:?}", started.elapsed());
