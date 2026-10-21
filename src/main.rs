@@ -1,16 +1,16 @@
 use std::env::current_dir;
-use std::io::{stdout, BufWriter, Write};
+use std::io::{BufWriter, Write, stdout};
 use std::time::Instant;
 
+use anyhow::{Context, Result, anyhow};
 use clap::Parser;
-use anyhow::{anyhow, Context, Result};
+use tracing::{debug, info};
 use xspring::cli::commands::Commands;
 use xspring::cli::logging::init as init_tracing;
 use xspring::cli::root::Cli;
 use xspring::client::spring_initializr::generate_project;
-use xspring::handlers::interactive::{pick_dependencies, pure_interactivity, quick_interactivity};
 use xspring::handlers::add::add_deps;
-use tracing::{debug, info};
+use xspring::handlers::interactive::{pick_dependencies, pure_interactivity, quick_interactivity};
 use xspring::handlers::list::{get_lists, print_categories, print_values};
 use xspring::models::list::Lists;
 
@@ -31,41 +31,49 @@ async fn main() -> Result<()> {
     let root_dir = cli.output.unwrap_or(current_dir()?);
 
     if let Some(command) = cli.command {
-
         let stdout = stdout();
         let handle = stdout.lock();
         let mut buf = BufWriter::new(handle);
 
         match command {
-           Commands::Quick {maven, extended, deps} => {
-                let query_params = quick_interactivity(maven, extended, deps).await
+            Commands::Quick {
+                maven,
+                extended,
+                deps,
+            } => {
+                let query_params = quick_interactivity(maven, extended, deps)
+                    .await
                     .with_context(|| "Failed to run quick interactivity")?;
-                generate_project(query_params, root_dir).await
+                generate_project(query_params, root_dir)
+                    .await
                     .with_context(|| "Failed to generate a spring boot project")?;
             }
 
             Commands::Add { deps } => {
                 let deps = match deps {
                     Some(d) if !d.is_empty() => d,
-                    _ => pick_dependencies().await
+                    _ => pick_dependencies()
+                        .await
                         .with_context(|| "Failed to pick dependencies interactively")?,
                 };
-                add_deps(&root_dir, deps).await
+                add_deps(&root_dir, deps)
+                    .await
                     .with_context(|| "Failed to add dependencies")?;
             }
 
-           Commands::List { java: true, .. } => {
-                let java_versions: Lists = get_lists("java").await
+            Commands::List { java: true, .. } => {
+                let java_versions: Lists = get_lists("java")
+                    .await
                     .with_context(|| "Failed to get java versions")?;
                 writeln!(&mut buf, "Available Java Versions:")?;
 
                 print_values(&mut buf, java_versions)
-                 .with_context(|| "Failed to print java versions")?;
-                
+                    .with_context(|| "Failed to print java versions")?;
             }
 
-           Commands::List { boot: true, .. } => {
-                let boot_versions: Lists = get_lists("boot").await
+            Commands::List { boot: true, .. } => {
+                let boot_versions: Lists = get_lists("boot")
+                    .await
                     .with_context(|| "Failed to get boot version")?;
                 writeln!(&mut buf, "Available Spring Boot Versions:")?;
 
@@ -73,8 +81,11 @@ async fn main() -> Result<()> {
                     .with_context(|| "Failed to print boot versions")?;
             }
 
-           Commands::List { project_type: true, .. } => {
-                let project_types: Lists = get_lists("project_type").await
+            Commands::List {
+                project_type: true, ..
+            } => {
+                let project_types: Lists = get_lists("project_type")
+                    .await
                     .with_context(|| "Failed to get project types")?;
                 writeln!(&mut buf, "Available Project Types:")?;
 
@@ -82,17 +93,18 @@ async fn main() -> Result<()> {
                     .with_context(|| "Failed to print project types")?;
             }
 
-           Commands::List { language: true, .. } => {
-                let languages = get_lists("language").await
+            Commands::List { language: true, .. } => {
+                let languages = get_lists("language")
+                    .await
                     .with_context(|| "Failed to get languages")?;
                 writeln!(&mut buf, "Available Languages:")?;
 
-                print_values(&mut buf, languages)
-                    .with_context(|| "Failed to print languages")?;
+                print_values(&mut buf, languages).with_context(|| "Failed to print languages")?;
             }
 
-           Commands::List { deps: true, ..  } => {
-                let categories = get_lists("deps").await
+            Commands::List { deps: true, .. } => {
+                let categories = get_lists("deps")
+                    .await
                     .with_context(|| "Failed to get dependencies")?;
                 writeln!(&mut buf, "Available Dependencies:-")?;
                 writeln!(&mut buf, " ")?;
@@ -102,14 +114,17 @@ async fn main() -> Result<()> {
             }
 
             _ => {
-                return Err(anyhow!("Invalid or unimplemented command. Please use '--help' or '-h' to see available commands."));
+                return Err(anyhow!(
+                    "Invalid or unimplemented command. Please use '--help' or '-h' to see available commands."
+                ));
             }
         }
-
     } else {
-        let query_params = pure_interactivity().await
+        let query_params = pure_interactivity()
+            .await
             .with_context(|| "Failed to run pure interactivity")?;
-        generate_project(query_params, root_dir).await
+        generate_project(query_params, root_dir)
+            .await
             .with_context(|| "Failed to generate a spring boot project")?;
     }
 
