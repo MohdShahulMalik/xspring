@@ -1,85 +1,60 @@
-# xspring: The Spring Boot Generator and Dependency Manager
+# xspring
 
 [![Crates.io](https://img.shields.io/crates/v/xspring.svg)](https://crates.io/crates/xspring)
 [![Docs.rs](https://docs.rs/xspring/badge.svg)](https://docs.rs/xspring)
 [![License: MIT OR Apache-2.0](https://img.shields.io/crates/l/xspring.svg)](https://opensource.org/licenses/MIT)
 
-**xspring** is a fast, modern command-line interface (CLI) for Spring Boot projects. It does three things: it **scaffolds** new projects through an interactive walkthrough, it **explains** what the Spring ecosystem offers, and it **adds dependencies** to projects you already have — all without leaving the terminal.
+xspring drives the [Spring Initializr API](https://start.spring.io) from the terminal.
 
-Built in Rust on top of the official Spring Initializr API, xspring turns `start.spring.io` into something you can drive from a shell. From an idea to `public static void main` in seconds; from a bare `pom.xml` to a fully wired-up service in one command.
-
-## Core Features
+## Features
 
 ### Scaffold
 
-- **Interactive by Default**: Run `xspring` with no arguments to enter a step-by-step guided mode. It prompts you for everything needed to create a project, including:
-    - Project metadata (Group ID, Artifact ID, Name, Description)
-    - Build tool (Maven or Gradle)
-    - Language (Java, Kotlin, or Groovy)
-    - Spring Boot version
-    - Packaging (Jar or War)
-    - Java version
-    - Dependencies
-- **Intelligent Fuzzy-Finding**: Forget memorizing exact option names. Simply start typing to filter through choices for dependencies, Spring Boot versions, languages, and more.
-    - Example: Typing `sec` might suggest `Spring Security`.
-    - Navigate suggestions with arrow keys and select your desired thing.
-- **Accelerated Setup With Quick Interactivity**: Use the `quick` subcommand for a faster, streamlined project setup with sensible defaults.
-    - use `-e` or `--extended` flag to scaffold a project more quickly
-    - use `-m` or `--maven` if you prefer to change the default project type
-    - use `-d` or `--deps` to add dependencies to your project interactively
+`xspring` prompts you for the project metadata, such as the group id and artifact id, and scaffolds a Spring Boot project from your answers.
 
-### Explore
+The build tool, language, Spring Boot version, packaging, Java version and dependencies are prompted for as well. The prompts are fuzzy finders. Type `sec` and the list narrows to Spring Security. Arrow keys move through the matches, space selects one.
 
-- **Discoverability and Exploration**: xspring helps you explore the Spring ecosystem without leaving your terminal.
-    - `xspring list --deps` or `-d`: Browse all available dependencies by category.
-    - `xspring list --boot` or `-b`: See a list of supported Spring Boot versions (stable, milestone, and snapshot).
-    - `xspring list --java` or `-j`: Check the available Java runtimes.
-    - `xspring list --type` or `-t`: Check the available project types.
-    - `xspring list --language` or `-l`: Check the available languages.
+Every project comes with a git repository and a `.gitignore` written for Spring Boot.
 
 ### Extend
 
-- **Add Dependencies to an Existing Project**: The `add` subcommand wires dependencies into a project you already have, editing the build file in place.
-    - Works with Maven (`pom.xml`), Gradle Groovy (`build.gradle`) and Gradle Kotlin (`build.gradle.kts`).
-    - Uses the same dependency ids as `xspring list --deps`.
-    - Surgically edits the build file: your comments, indentation and line endings survive.
-    - Idempotent — dependencies that are already present are skipped.
-    - Works without a network connection.
+`xspring add` inserts dependencies into the build file of a project you already have.
 
-## Why Use xspring?
+- It finds the build file in the target directory, checking `pom.xml` first, then `build.gradle.kts`, then `build.gradle`.
+- **Your comments, indentation and line endings survive the edit.**
+- For Maven it inserts into the production `<dependencies>` block only, never into `<dependencyManagement>`, a `<profile>` or a `<build>`.
+- For Gradle it picks the right scope for each dependency (`implementation`, `testImplementation`, `runtimeOnly`, `annotationProcessor`, `developmentOnly`) and matches the file's own style. Groovy keeps single quotes, the Kotlin DSL uses `implementation("…")`.
+- A dependency that is already in the file is reported and left alone.
 
-- **One tool for the whole loop**: Scaffold a project, explore what's available, and extend what you built — without switching between a browser, an IDE and a build tool.
-- **Fast**: Written in Rust, xspring is incredibly fast and responsive. The Initializr metadata is cached on disk, so repeat commands return instantly instead of waiting on the network.
-- **Safe edits**: Build files are edited surgically rather than regenerated, so a `pom.xml` full of comments and custom formatting comes out the other side intact.
-- **Works offline**: The cached metadata keeps `xspring list` and the interactive picker usable even when the network is down.
-- **User-Friendly**: Its interactive nature makes it accessible to developers of all skill levels, while every prompt has a flag for scripting.
-- **Reduces Errors**: By guiding the user, it helps prevent typos and misconfigurations.
+The dependency table ships with the binary, so no network request is involved.
+
+### Explore
+
+`xspring list` prints the catalog the Initializr exposes, so you can check which dependency ids and versions exist.
 
 ## Installation
 
-You can install `xspring` from Crates.io:
+Install it from Crates.io:
 
 ```bash
 cargo install xspring
 ```
 
-Building from source requires **Rust 1.88 or newer** (the `zip` crate raised its MSRV there).
+Building from source needs Rust 1.88 or newer, the MSRV the `zip` crate requires.
 
 ## Usage
 
-### Interactive Mode
+### Interactive mode
 
-Run `xspring` with no arguments to enter the interactive mode:
+Run `xspring` with no arguments and answer every prompt:
 
 https://github.com/user-attachments/assets/bd81382f-f7f5-406d-b36e-06b31715eaf7
 
-### Quick-Interactive Mode
+### Quick mode
 
-For a faster setup, you can use the `quick` subcommand. This mode uses sensible defaults for most options, only prompting for the essential information.
+`xspring quick` uses the Initializr defaults for most options and only prompts for what it cannot guess.
 
-**Default Quick Mode**
-
-By default, the `quick` subcommand will prompt for the Group ID, Artifact ID, Display Name, and Description.
+**Default**
 
 ```bash
 $ xspring quick
@@ -89,9 +64,9 @@ $ xspring quick
 💡 Project Description: A RESTful API for managing users
 ```
 
-**Extended Quick Mode (`-e` or `--extended`)**
+**`-e` or `--extended`**
 
-You can further streamline the process with the `-e` or `--extended` flag, which uses default values for the Display Name and Description, only prompting for the Group ID and Artifact ID.
+Skips the display name and the description.
 
 ```bash
 $ xspring quick -e
@@ -99,9 +74,9 @@ $ xspring quick -e
 🎫 Artifact ID: user-service
 ```
 
-**Dependencies Flag (`-d` or `--deps`)**
+**`-d` or `--deps`**
 
-The `-d` or `--deps` flag allows you to select dependencies for your project. This can be combined with other flags.
+Adds the dependency picker. It combines with the other flags.
 
 ```bash
 $ xspring quick -d
@@ -112,9 +87,9 @@ $ xspring quick -d
 🧩 Dependencies: › Spring Security - Spring Web - Lombok - ...
 ```
 
-**Maven Flag (`-m` or `--maven`)**
+**`-m` or `--maven`**
 
-By default, the `quick` subcommand uses Gradle as the project type. The `-m` or `--maven` flag allows you to override this and set the project type to Maven without prompting. This can be combined with either of the above modes.
+`quick` defaults to Gradle. This flag switches to Maven without asking.
 
 ```bash
 $ xspring quick -e -m
@@ -122,118 +97,154 @@ $ xspring quick -e -m
 🎫 Artifact ID: user-service
 ```
 
-### Adding Dependencies to an Existing Project
-
-The `add` subcommand edits the build file of a project that already exists.
+### Adding dependencies to an existing project
 
 ```bash
 $ xspring add -d web,data-jpa
 Added dependencies to pom "/path/to/project/pom.xml"
 ```
 
-**Non-interactive** — pass `-d`/`--deps` with a comma-separated list of dependency ids:
+Pass `-d`/`--deps` with a comma-separated list of dependency ids to skip the picker:
 
 ```bash
 xspring add -d web,data-jpa,lombok
 ```
 
-**Interactive** — run `xspring add` with no arguments to pick from the full catalog with the same fuzzy finder used everywhere else.
+Run `xspring add` with no arguments to pick from the full catalog with the same fuzzy finder used everywhere else.
 
-**What it does**
+An id that does not exist is reported before anything is written:
 
-- **Detects the build file** in the target directory: `pom.xml`, then `build.gradle.kts`, then `build.gradle`.
-- **Maven**: inserts into the production `<dependencies>` block only — never into `dependencyManagement`, a `<profile>` or `<build>` — and keeps your comments, indentation and line endings intact.
-- **Gradle**: picks the right scope for every dependency (`implementation`, `testImplementation`, `runtimeOnly`, `annotationProcessor`, `developmentOnly`) and matches the file's own style — Groovy keeps single quotes, Kotlin DSL uses `implementation("…")`.
-- **Skips what is already there**: a dependency that is already in the build file is reported and left alone.
-- **Never leaves a half-edited file**: every id is resolved before anything is written, so one typo aborts the whole operation.
-- **Catches typos**:
-
-  ```text
-  Unknown dependency id 'data-jpal'. Did you mean: data-jpa?
-  ```
-
-**Targeting another directory** with the global `-o`/`--output` flag:
-
-```bash
-xspring -o ../user-service add -d web
+```text
+Unknown dependency id 'data-jpal'. Did you mean: data-jpa?
 ```
 
-### Listing Options
+### Listing options
 
-- **List Dependencies**: `xspring list -d` or `xspring list --deps`
-- **List Spring Boot Versions**: `xspring list -b` or `xspring list --boot`
-- **List Java Versions**: `xspring list -j` or `xspring list --java`
-- **List Project Types(Ex. Maven)**: `xspring list -t` or `xspring list --type`
-- **List Languages**: `xspring list -l` or `xspring list --language`
+- `xspring list --deps` or `-d`: dependencies
+- `xspring list --boot` or `-b`: Spring Boot versions
+- `xspring list --java` or `-j`: Java versions
+- `xspring list --type` or `-t`: project types, Maven and Gradle
+- `xspring list --language` or `-l`: languages
 
 ```bash
-# List all available dependencies
+# every available dependency
 $ xspring list --deps
 
-# List all supported Java versions
+# every supported Java version
 $ xspring list --java
 ```
 
-### Output Directory
+### Output directory
 
-- `-o` or `--output`: Specify a directory to output the generated project to, or the project whose build file `add` should edit.
+`-o` or `--output` sets the directory to generate into, or the project whose build file `add` should edit.
+
+```bash
+xspring -o my-new-project
+xspring -o my-new-project add -d web
+```
+
+### Git and `.gitignore`
+
+Here is what a generated project looks like:
+
+```bash
+$ xspring quick
+📦 Group ID: com.mycorp
+🎫 Artifact ID: user-service
+...
+Generated a Spring Boot project in "user-service"
+```
+
+```bash
+$ cd user-service
+$ git status
+On branch main
+
+No commits yet
+
+Untracked files:
+  .gitattributes
+  .gitignore
+  mvnw
+  mvnw.cmd
+  pom.xml
+  src/
+```
+
+xspring writes the repository itself rather than shelling out to `git`, so git does not have to be installed to get one. `HEAD` points at `main`, or at whatever `init.defaultBranch` your git configuration sets. No commit is made, so the first one is yours.
+
+The `.gitignore` covers the build output of both Maven and Gradle, the common IDEs, log files and OS clutter:
+
+```gitignore
+### Maven ###
+target/
+.mvn/wrapper/maven-wrapper.jar
+
+### Gradle ###
+.gradle/
+build/
+!gradle/wrapper/gradle-wrapper.jar
+...
+```
+
+Build output that lives under `src/` is re-included, so a `src/main/target` directory is still tracked.
+
+Two things change the outcome:
+
+- If the project already sits inside another git repository, no nested repository is created. `cargo new` behaves the same way.
+- If you do not want a repository, pass `--no-git` or `-ng`:
 
   ```bash
-  xspring -o my-new-project
-  xspring -o my-new-project add -d web
+  xspring quick --no-git
+  xspring quick -ng
   ```
 
 ### Logging
 
-`xspring` creates daily rotating log files in a `logs` directory in the directory where it is executed.
+`xspring` writes daily rotating log files to a `logs` directory in the directory it runs from.
 
-You can control the log verbosity with the following flags:
-
-- `-v, --verbose`: Increases the verbosity of the output. Can be used multiple times to increase the level of detail (e.g., `-v` for warnings, `-vv` for info, `-vvv` for debug, `-vvvv` for trace).
-- `-q, --quiet`: Suppresses all output except for errors.
+- `-v, --verbose`: raises the verbosity. Repeat it for more detail (`-v` for warnings, `-vv` for info, `-vvv` for debug, `-vvvv` for trace).
+- `-q, --quiet`: everything except errors is suppressed.
 
 ```bash
-# Run with verbose output to show debug information
+# debug output on the terminal
 $ xspring -vvv
 
-# Run in quiet mode
+# errors only
 $ xspring --quiet
 ```
 
-Two things are written when you raise the verbosity:
+Raising the verbosity turns on two writers:
 
-- **the terminal (stderr)** shows the level you asked for (`-v` → warnings, `-vv` → info, …);
-- **the log file** always records `info` and above, so it explains what the run did — where the time went, whether the metadata came from the cache, how long the download took.
+- stderr shows the level you asked for (`-v` gives warnings, `-vv` gives info, and so on).
+- the log file always records `info` and above, so it explains what the run did, where the time went, whether the metadata came from the cache and how long the download took.
 
-The log file is only created once you ask for more than errors, so a plain `xspring list --java` still leaves no trace in your working directory.
+The log file only appears once you ask for more than errors, so a plain `xspring list --java` leaves nothing behind in your working directory.
 
 ### Caching
 
-The Spring Initializr answers `GET /` with a ~75 KB JSON document describing every dependency, boot version and packaging option. Producing that document is the slowest thing this CLI does — the server needs a few hundred milliseconds to think about it, and the response is not compressed.
+The Spring Initializr answers `GET /` with a ~75 KB JSON document describing every dependency, boot version and packaging option. Producing that document is the slowest thing this CLI does. The server needs a few hundred milliseconds to build it, and the response is not compressed.
 
 That document barely ever changes, so `xspring` keeps it on disk:
 
-- a **fresh** cached document is used without any network request at all;
-- a **stale** one is revalidated with a conditional request (`If-None-Match`), which normally answers `304 Not Modified`;
-- if the network is unreachable, the stale copy is used as a fallback, so the CLI keeps working offline.
+- a fresh cached document is used without any network request at all
+- a stale one is revalidated with a conditional request (`If-None-Match`), which normally answers `304 Not Modified` and costs one round trip instead of a full download
+- if the network is unreachable, the stale copy is used as a fallback, so the CLI keeps working offline
 
-The Initializr's `ETag` is a fingerprint of the document, so the cached copy can never silently drift: if the content changes, the server sends a new one.
+The `ETag` is a fingerprint of the document, so a cached copy cannot drift silently. When the content changes, the server sends a new `ETag` with it.
 
-| Variable | Effect |
-|---|---|
-| `XSPRING_CACHE_DIR` | Where the cache lives. Default: `$XDG_CACHE_HOME/xspring`, else `$HOME/.cache/xspring`, else a temp directory. |
-| `XSPRING_CACHE_TTL` | Seconds a cached document is served without revalidation. Default: `7200` (matches the server's `cache-control: max-age`). `0` revalidates on every run. |
-| `XSPRING_CACHE` | Set to `off` to disable the cache entirely. |
+### Environment variables
 
-### Network
-
-Every request has a timeout, so a hung server can never hang the CLI.
+Every request has a timeout, so a hung server cannot hang the CLI. These are the values you can override:
 
 | Variable | Effect |
 |---|---|
 | `XSPRING_HTTP_TIMEOUT` | Overall timeout for a single request, in seconds. Default: `30`. |
 | `XSPRING_HTTP_CONNECT_TIMEOUT` | Timeout for establishing the connection, in seconds. Default: `10`. |
 | `XSPRING_API_URL` | Base URL of the Spring Initializr. Default: `https://start.spring.io`. |
+| `XSPRING_CACHE_DIR` | Where the cache lives. Default: `$XDG_CACHE_HOME/xspring`, else `$HOME/.cache/xspring`, else a temp directory. |
+| `XSPRING_CACHE_TTL` | Seconds a cached document is served without revalidation. Default: `7200` (matches the server's `cache-control: max-age`). `0` revalidates on every run. |
+| `XSPRING_CACHE` | Set to `off` to disable the cache entirely. |
 | `XSPRING_LOG` | Maximum level written to the log file (`off`, `error`, `warn`, `info`, `debug`, `trace`). Default: `info`. |
 | `XSPRING_LOG_DIR` | Directory the rotating log file is written to. Default: `logs`. |
 
@@ -248,29 +259,35 @@ cargo install samply
 samply record -- ./target/release/xspring list --java
 ```
 
-## Building from Source
+## Building from source
 
-1.  Clone the repository:
+1. Clone the repository:
+
     ```bash
     git clone https://github.com/MohdShahulMalik/xspring.git
     ```
-2.  Navigate to the project directory:
+
+2. Change into the project directory:
+
     ```bash
     cd xspring
     ```
-3.  Install the project:
+
+3. Install it:
+
     ```bash
     cargo install --path .
     ```
-4.  The executable will be in `~/.cargo/bin/xspring`.
+
+4. The executable ends up in `~/.cargo/bin/xspring`.
 
 ## License
 
 This project is licensed under either of the following, at your option:
 
--   Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
--   MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
+- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+- MIT license ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
 ## Contributing
 
-Contributions are welcome! Please feel free to submit a pull request or open an issue.
+Pull requests and issues are welcome.
