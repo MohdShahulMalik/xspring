@@ -1,7 +1,7 @@
 use xspring::models::spring::InitializrMetadata;
 
 /// Real start.spring.io response (fetched 2026-10-19). Serializing our
-/// structs against it catches upstream API drift before users do — e.g. the
+/// structs against it catches upstream API drift before users do, e.g. the
 /// day `name`/`description` stopped shipping a `default` field.
 const METADATA: &str = include_str!("fixtures/metadata.json");
 

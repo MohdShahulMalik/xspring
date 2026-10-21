@@ -2,17 +2,18 @@
 //!
 //! `GET https://start.spring.io` answers with a ~75 KB JSON document that
 //! describes every dependency, boot version, packaging option and so on.
-//! Producing that document is the single slowest thing this CLI does: the
-//! server spends roughly 300 ms thinking about it and then trickles the
-//! response back. But the document barely ever changes — the API itself sends
+//! Building that document is the slowest thing this CLI does. The server
+//! needs roughly 300 ms for it and sends the response uncompressed.
+//!
+//! The document itself barely ever changes. The API sends
 //! `cache-control: max-age=7200` and an `ETag` to say so.
 //!
-//! So the last response is kept on disk and reused:
+//! The last response is kept on disk and reused:
 //!
 //! * a **fresh** entry is served without touching the network at all;
 //! * a **stale** entry is revalidated with a conditional request
 //!   (`If-None-Match`), which normally answers `304 Not Modified` and costs
-//!   one cheap round trip instead of a full download;
+//!   one round trip instead of a full download;
 //! * if the network is unreachable, a stale entry is used as a fallback so the
 //!   CLI keeps working offline.
 //!

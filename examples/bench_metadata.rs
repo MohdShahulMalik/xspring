@@ -3,14 +3,14 @@ use xspring::client::spring_initializr::get_metadata;
 
 #[tokio::main(flavor = "current_thread")]
 async fn main() {
-    // 1. The path the CLI actually uses today
+    // 1. The path the CLI uses
     for i in 1..=3 {
         let t = Instant::now();
         let _ = get_metadata().await;
         println!("get_metadata() run {i}: {:?}", t.elapsed());
     }
 
-    // 2. Reused client (connection pooling) — same URL
+    // 2. Reused client (connection pooling), same URL
     let client = reqwest::Client::new();
     for i in 1..=3 {
         let t = Instant::now();

@@ -133,7 +133,7 @@ async fn fetch(
         Err(err) if err.is_timeout() => {
             return Err(anyhow!(
                 "Timed out after {}s while fetching metadata from {url}. The Spring \
-                 Initializr may be slow or unreachable — retry, or raise \
+                 Initializr may be slow or unreachable: retry, or raise \
                  XSPRING_HTTP_TIMEOUT.",
                 crate::client::http::request_timeout_seconds()
             ));
@@ -214,7 +214,7 @@ pub async fn generate_project(params: QueryParam, out_dir: PathBuf) -> Result<()
         Err(err) if err.is_timeout() => {
             return Err(anyhow!(
                 "Timed out after {}s while downloading the generated project from {url}. \
-                 The Spring Initializr may be slow or unreachable — retry, or raise \
+                 The Spring Initializr may be slow or unreachable: retry, or raise \
                  XSPRING_HTTP_TIMEOUT.",
                 crate::client::http::request_timeout_seconds()
             ));

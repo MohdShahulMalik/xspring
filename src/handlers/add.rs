@@ -27,7 +27,8 @@ impl std::fmt::Debug for BuildFile {
     }
 }
 
-/// Id resolved against the built-in table: its Initializr id plus coordinates.
+/// A dependency id resolved against the built-in table, giving its Initializr
+/// id and its coordinates.
 pub type ResolvedDep = (&'static str, &'static Dep);
 
 #[derive(Clone, Copy, Debug)]
@@ -136,9 +137,9 @@ pub fn find_deps_block(pom: &str) -> Option<DepsBlock> {
     }
 }
 
-/// Pure text surgery on the pom contents: returns the new text with one
-/// `<dependency>` entry per dep inserted at the end of the production
-/// dependencies block. Nothing else in the file is touched.
+/// Text-only edit of the pom contents. Returns the new text with one
+/// `<dependency>` entry per dep, inserted at the end of the production
+/// dependencies block. Nothing else in the file changes.
 pub fn insert_into_pom(content: &str, deps: &[ResolvedDep]) -> Result<String> {
     let block = find_deps_block(content).context("No <dependencies> block in pom.xml")?;
     let closing = "</dependencies>";
@@ -262,9 +263,9 @@ fn find_matching_brace(content: &str, open_brace_pos: usize) -> Option<usize> {
     None
 }
 
-/// Pure text surgery on a Gradle build script: inserts one scoped statement
-/// per dep right before the block's closing brace, matching the file's own
-/// quote style and indentation.
+/// Text-only edit of a Gradle build script. Inserts one scoped statement per
+/// dep right before the block's closing brace, matching the file's own quote
+/// style and indentation.
 pub fn insert_into_gradle(content: &str, deps: &[ResolvedDep], flavor: Flavor) -> Result<String> {
     let open_brace_pos = gradle_block_re()
         .find(content)

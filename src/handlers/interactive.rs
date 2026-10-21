@@ -9,7 +9,7 @@ use crate::{cli::interactive_ui::base_config, client::spring_initializr::get_met
 /// metadata defaults from start.spring.io.
 #[derive(Debug, Clone, Copy, Default)]
 pub struct InteractiveConfig {
-    /// Prompt for project type, language, boot version, packaging and java
+    /// Prompt for project type, language, boot version, packaging and Java
     /// version. When false, the metadata defaults are used without prompting.
     pub full: bool,
 
@@ -25,13 +25,14 @@ pub struct InteractiveConfig {
 }
 
 impl InteractiveConfig {
-    /// Everything gets prompted (what `xspring` with no args does today).
+    /// Everything gets prompted (what `xspring` with no arguments does).
     pub fn full() -> Self {
         Self { full: true, name_description: true, deps: true, maven: false }
     }
 
-    /// The `xspring quick` behavior: only group/artifact (+ name/description
-    /// and/or deps depending on the flags).
+    /// The `xspring quick` behavior. Only the group and artifact id are
+    /// always prompted, plus the name, description and dependencies when the
+    /// flags ask for them.
     pub fn quick(maven: bool, extended: bool, deps: bool) -> Self {
         Self { full: false, name_description: !extended, deps, maven }
     }
@@ -214,7 +215,7 @@ pub async fn interactive(config: InteractiveConfig) -> Result<QueryParam> {
         java_versions.swap(0, default_idx);
 
         let java_version = Select::new("Java Version:", java_versions)
-            .with_help_message("Select java version for your project")
+            .with_help_message("Select the Java version for your project")
             .with_render_config(base_config("☕"))
             .prompt()
             .with_context(|| "Failed to get input for Java Version")?;
@@ -266,13 +267,13 @@ pub async fn interactive(config: InteractiveConfig) -> Result<QueryParam> {
     })
 }
 
-/// Full interactivity: every field is prompted.
+/// Full interactivity. Every field is prompted.
 pub async fn pure_interactivity() -> Result<QueryParam> {
     interactive(InteractiveConfig::full()).await
 }
 
-/// Quick interactivity: only group/artifact are always prompted; the rest
-/// depends on the flags.
+/// Quick interactivity. Only the group and artifact id are always prompted;
+/// the rest depends on the flags.
 pub async fn quick_interactivity(maven: bool, extended: bool, deps: bool) -> Result<QueryParam> {
     interactive(InteractiveConfig::quick(maven, extended, deps)).await
 }

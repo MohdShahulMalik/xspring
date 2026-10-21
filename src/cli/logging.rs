@@ -5,7 +5,7 @@
 //! * **stderr**, filtered at the level the user asked for on the command line
 //!   (`-v` → warnings, `-vv` → info, `-vvv` → debug, `-vvvv` → trace);
 //! * **a daily rotating file**, filtered at `info` and above so the file always
-//!   records what the run did — where the time went, whether the metadata came
+//!   records what the run did, where the time went, whether the metadata came
 //!   from the cache, how long the download took.
 //!
 //! The file is only created when the user asked for more than errors, so a
