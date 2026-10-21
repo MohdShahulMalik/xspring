@@ -3,3 +3,4 @@ logs/
 .cargo/
 NOTES.md
 GEMINI.md
+plan-dist-manifest.json
