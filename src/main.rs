@@ -106,7 +106,7 @@ async fn main() -> Result<()> {
                 let categories = get_lists("deps")
                     .await
                     .with_context(|| "Failed to get dependencies")?;
-                writeln!(&mut buf, "Available Dependencies:-")?;
+                writeln!(&mut buf, "Available Dependencies:")?;
                 writeln!(&mut buf, " ")?;
 
                 print_categories(&mut buf, categories)
