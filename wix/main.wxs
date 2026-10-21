@@ -69,7 +69,7 @@
 
         <Package Id='*'
             Keywords='Installer'
-            Description='Interactive CLI to scaffold Spring Boot projects and add dependencies to existing ones — the terminal companion to start.spring.io'
+            Description='Scaffold Spring Boot projects and add dependencies to existing ones from the terminal'
             Manufacturer='Shahul Malik &lt;mohdshahulmalik@gmail.com'
             InstallerVersion='450'
             Languages='1033'
