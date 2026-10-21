@@ -202,7 +202,9 @@ fn decode(body: &str) -> Result<InitializrMetadata> {
 }
 
 /// Downloads the generated project and extracts it into `out_dir`.
-pub async fn generate_project(params: QueryParam, out_dir: PathBuf) -> Result<()> {
+///
+/// Returns the directory the project was extracted to.
+pub async fn generate_project(params: QueryParam, out_dir: PathBuf) -> Result<PathBuf> {
     let client = http_client();
     let started = Instant::now();
     let url = starter_url();
@@ -259,9 +261,9 @@ pub async fn generate_project(params: QueryParam, out_dir: PathBuf) -> Result<()
         started.elapsed()
     );
     println!(
-        "Successfully Generated a Spring Boot project folder at {:?}",
+        "Generated a Spring Boot project in {:?}",
         project_dir
     );
 
-    Ok(())
+    Ok(project_dir)
 }
