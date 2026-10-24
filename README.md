@@ -4,7 +4,7 @@
 [![Docs.rs](https://docs.rs/xspring/badge.svg)](https://docs.rs/xspring)
 [![License: MIT OR Apache-2.0](https://img.shields.io/crates/l/xspring.svg)](https://opensource.org/licenses/MIT)
 
-xspring drives the [Spring Initializr API](https://start.spring.io) from the terminal.
+xspring replaces the click-through at [start.spring.io](https://start.spring.io) with a terminal tool. It scaffolds new spring boot project with git initialized and adding dependencies to existing projects. The plan is to become an all-in-one build tool for Spring, the way npm and bun are for JavaScript. `xspring add` is an early taste of that.
 
 ## Features
 
