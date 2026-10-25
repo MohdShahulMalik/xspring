@@ -9,7 +9,7 @@ const NO_GIT_SHORT: &str = "-ng";
 
 #[derive(Parser, Debug)]
 #[command(name = "xspring")]
-#[command(version = "1.0")]
+#[command(version)]
 #[command(about = "An interactive Spring Boot project generator")]
 #[command(author = "Shahul Malik")]
 pub struct Cli {
