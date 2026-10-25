@@ -141,18 +141,27 @@ pub fn find_deps_block(pom: &str) -> Option<DepsBlock> {
 /// `<dependency>` entry per dep, inserted at the end of the production
 /// dependencies block. Nothing else in the file changes.
 pub fn insert_into_pom(content: &str, deps: &[ResolvedDep]) -> Result<String> {
-    let block = find_deps_block(content).context("No <dependencies> block in pom.xml")?;
-    let closing = "</dependencies>";
+    let block = find_deps_block(content)
+        .context("No <dependencies> block (or the pom.xml is malformed)")?;
+
+    // The closing tag itself comes from the text, so a written variant like
+    // `</dependencies >` splices correctly: quick-xml accepted it, and end_pos
+    // sits right after its `>`.
+    let close_tag = "</dependencies";
+    let close_start = content[..block.end_pos]
+        .rfind(close_tag)
+        .context("The <dependencies> block has no `</dependencies>` closing tag")?;
+    debug_assert!(content[close_start..block.end_pos].ends_with('>'));
+    let closing = &content[close_start..block.end_pos];
 
     // Right before the closing tag there is whitespace: the closing tag's own
     // indentation. Split the insertion point from that whitespace so new
     // entries land cleanly on their own lines.
-    let mut cut = block.end_pos - closing.len();
+    let mut cut = close_start;
     while cut > 0 && content[..cut].ends_with([' ', '\t']) {
         cut -= 1;
     }
-    let closing_indent = content[cut..block.end_pos - closing.len()].to_string();
-    debug_assert!(content[block.end_pos - closing.len()..].starts_with(closing));
+    let closing_indent = content[cut..close_start].to_string();
 
     let eol = eol_of(content);
     let indent = maven_indent(content, block).context("Failed to derive indentation")?;
@@ -205,7 +214,8 @@ pub fn insert_into_pom(content: &str, deps: &[ResolvedDep]) -> Result<String> {
     let mut out = String::with_capacity(content.len() + snippet.len());
     out.push_str(&content[..cut]);
     out.push_str(&snippet);
-    out.push_str(&content[block.end_pos - closing.len()..]);
+    out.push_str(closing);
+    out.push_str(&content[block.end_pos..]);
     Ok(out)
 }
 
@@ -481,4 +491,35 @@ pub async fn add_deps(dir: &Path, ids: Vec<String>) -> Result<()> {
 
     println!("Added dependencies to {build_file:?}");
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{find_deps_block, insert_into_pom};
+    use crate::models::deps_map::lookup;
+
+    /// A closing tag with stray whitespace (`</dependencies >`) is valid XML
+    /// and must splice correctly, not corrupt the file.
+    #[test]
+    fn a_closing_tag_with_inner_whitespace_still_splices_cleanly() {
+        let pom = "
+<project>
+<dependencies>
+<dependency><artifactId>x</artifactId></dependency>
+</dependencies >
+</project>";
+
+        let block = find_deps_block(pom).expect("the block is found");
+        assert_eq!(
+            &pom[block.end_pos - "</dependencies >".len()..block.end_pos],
+            "</dependencies >"
+        );
+
+        let out = insert_into_pom(pom, &[lookup("web").unwrap()]).unwrap();
+        assert!(out.contains("<artifactId>spring-boot-starter-webmvc</artifactId>"));
+        // The whitespace variant survives the edit, and the output is still a
+        // pom whose dependencies block can be found again.
+        assert!(out.contains("</dependencies >"));
+        assert!(find_deps_block(&out).is_some());
+    }
 }
