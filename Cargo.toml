@@ -1,9 +1,9 @@
 [package]
 name = "xspring"
-version = "0.2.1"
+version = "0.2.2"
 edition = "2024"
 rust-version = "1.88"
-authors = ["Shahul Malik <mohdshahulmalik@gmail.com"]
+authors = ["Shahul Malik <mohdshahulmalik@gmail.com>"]
 license = "MIT OR Apache-2.0"
 description = "Scaffold Spring Boot projects and add dependencies to existing ones from the terminal"
 readme = "README.md"
