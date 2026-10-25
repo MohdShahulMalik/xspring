@@ -450,6 +450,13 @@ pub fn unknown_id_error(id: &str) -> anyhow::Error {
     anyhow!("Unknown dependency id '{id}'. {hint}")
 }
 
+/// Replaces a build file atomically: a crash mid-write can never truncate a
+/// user's `pom.xml` or `build.gradle`.
+fn replace_file(path: &Path, contents: &str) -> Result<()> {
+    crate::util::atomic_write(path, contents.as_bytes())
+        .with_context(|| format!("Failed to write {}", path.display()))
+}
+
 pub async fn add_deps(dir: &Path, ids: Vec<String>) -> Result<()> {
     let build_file = detect_build_file(dir)
         .context("No pom.xml, build.gradle, or build.gradle.kts found in this directory")?;
@@ -474,7 +481,7 @@ pub async fn add_deps(dir: &Path, ids: Vec<String>) -> Result<()> {
             let content = fs::read_to_string(path)
                 .with_context(|| format!("Failed to read {}", path.display()))?;
             let out = insert_into_pom(&content, &resolved)?;
-            fs::write(path, out)?;
+            replace_file(path, &out)?;
         }
         BuildFile::GradleGroovy(path) | BuildFile::GradleKts(path) => {
             let flavor = if matches!(build_file, BuildFile::GradleKts(_)) {
@@ -485,7 +492,7 @@ pub async fn add_deps(dir: &Path, ids: Vec<String>) -> Result<()> {
             let content = fs::read_to_string(path)
                 .with_context(|| format!("Failed to read {}", path.display()))?;
             let out = insert_into_gradle(&content, &resolved, flavor)?;
-            fs::write(path, out)?;
+            replace_file(path, &out)?;
         }
     }
 
