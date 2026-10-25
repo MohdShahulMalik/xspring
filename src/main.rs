@@ -122,6 +122,10 @@ async fn main() -> Result<()> {
                 ));
             }
         }
+
+        // The trailing newline has to be ours to check: the implicit flush at
+        // drop swallows errors, which would truncate silently via a closed pipe.
+        buf.flush()?;
     } else {
         let query_params = pure_interactivity()
             .await
