@@ -3,7 +3,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 use std::sync::OnceLock;
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use quick_xml::{Reader, events::Event};
 use regex_lite::Regex;
 use tracing::debug;
@@ -192,7 +192,10 @@ pub fn insert_into_pom(content: &str, deps: &[ResolvedDep]) -> Result<String> {
     }
 
     if snippet.is_empty() {
-        return Err(anyhow!("Nothing to add: {} already present, 0 added", skipped));
+        return Err(anyhow!(
+            "Nothing to add: {} already present, 0 added",
+            skipped
+        ));
     }
 
     // The closing indent after the last entry puts </dependencies> back on
@@ -223,7 +226,11 @@ fn maven_indent(content: &str, block: DepsBlock) -> Option<String> {
 }
 
 fn eol_of(content: &str) -> &'static str {
-    if content.contains("\r\n") { "\r\n" } else { "\n" }
+    if content.contains("\r\n") {
+        "\r\n"
+    } else {
+        "\n"
+    }
 }
 
 fn gradle_block_re() -> &'static Regex {
@@ -322,7 +329,10 @@ pub fn insert_into_gradle(content: &str, deps: &[ResolvedDep], flavor: Flavor) -
     }
 
     if lines.is_empty() {
-        return Err(anyhow!("Nothing to add: {} already present, 0 added", skipped));
+        return Err(anyhow!(
+            "Nothing to add: {} already present, 0 added",
+            skipped
+        ));
     }
 
     // Insert on their own lines just before the closing brace's line.
@@ -330,7 +340,10 @@ pub fn insert_into_gradle(content: &str, deps: &[ResolvedDep], flavor: Flavor) -
     if content[closing_line_start..close_pos].trim() == "}" {
         // Closing brace on its own line with its own indentation: replace
         // nothing, just put the new lines before it.
-        let snippet = lines.iter().map(|l| format!("{l}{eol}")).collect::<String>();
+        let snippet = lines
+            .iter()
+            .map(|l| format!("{l}{eol}"))
+            .collect::<String>();
         let mut out = String::with_capacity(content.len() + snippet.len());
         out.push_str(&content[..closing_line_start]);
         out.push_str(&snippet);
@@ -340,7 +353,10 @@ pub fn insert_into_gradle(content: &str, deps: &[ResolvedDep], flavor: Flavor) -
 
     // Orphaned/inline closing brace: insert right before it, making sure we
     // start on a fresh line.
-    let mut snippet = lines.iter().map(|l| format!("{l}{eol}")).collect::<String>();
+    let mut snippet = lines
+        .iter()
+        .map(|l| format!("{l}{eol}"))
+        .collect::<String>();
     if !content[..close_pos].ends_with('\n') {
         snippet.insert_str(0, eol);
     }
@@ -404,7 +420,9 @@ pub fn suggest_ids(input: &str) -> Vec<&'static str> {
         .filter(|(k, _)| {
             let parts: Vec<&str> = k.split(['-', '_', '.']).collect();
             tokens.len() <= parts.len()
-                && tokens.iter().all(|t| parts.iter().any(|p| matches_token(t, p)))
+                && tokens
+                    .iter()
+                    .all(|t| parts.iter().any(|p| matches_token(t, p)))
         })
         .filter(|(k, _)| *k != input)
         .map(|(k, _)| *k)

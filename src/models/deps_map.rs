@@ -15,6 +15,9 @@ pub struct Dep {
     pub maven_optional: bool,
 }
 
+// Data table, deliberately one dependency per line: hand-aligned columns would
+// be destroyed by a rewrite, so rustfmt skips it.
+#[rustfmt::skip]
 pub static DEPS: &[(&str, Dep)] = &[
     ("native",   Dep { group: "org.springframework.boot", artifact: "spring-boot", gradle_scope: GradleScope::Implementation, maven_optional: false }),
     ("dgs-codegen",   Dep { group: "com.netflix.graphql.dgs.codegen", artifact: "graphql-dgs-codegen-gradle", gradle_scope: GradleScope::Implementation, maven_optional: false }),

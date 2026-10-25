@@ -72,7 +72,10 @@ async fn main() {
     println!("status                : {status}");
     println!("content-length header : {content_length:?}");
     println!("body bytes            : {}", body.len());
-    println!("dependency categories : {}", metadata.dependencies.values.len());
+    println!(
+        "dependency categories : {}",
+        metadata.dependencies.values.len()
+    );
     println!();
     println!("client build          : {client_build:>10.2?}");
     println!("request -> headers    : {headers:>10.2?}   (dns+tcp+tls+server)");
@@ -97,7 +100,10 @@ async fn main() {
         .text()
         .await
         .expect("second body failed");
-    println!("2nd request, same client (connection reused): {:?}", t.elapsed());
+    println!(
+        "2nd request, same client (connection reused): {:?}",
+        t.elapsed()
+    );
     println!("  -> the delta vs 'request -> headers' above is the connection setup cost");
     println!();
 

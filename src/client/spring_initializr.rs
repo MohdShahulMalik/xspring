@@ -1,13 +1,13 @@
 use std::{io::Cursor, path::PathBuf, time::Instant};
 
-use anyhow::{anyhow, Context, Result};
+use anyhow::{Context, Result, anyhow};
 use reqwest::header::{ACCEPT, ETAG, IF_NONE_MATCH, USER_AGENT};
 use reqwest::{Client, StatusCode};
 use tracing::{debug, info, warn};
 use zip::ZipArchive;
 
 use crate::client::cache::MetadataCache;
-use crate::client::http::{http_client, USER_AGENT as CLI_USER_AGENT};
+use crate::client::http::{USER_AGENT as CLI_USER_AGENT, http_client};
 use crate::models::spring::{InitializrMetadata, QueryParam};
 
 /// Default base URL of the Spring Initializr API.
@@ -222,7 +222,8 @@ pub async fn generate_project(params: QueryParam, out_dir: PathBuf) -> Result<Pa
             ));
         }
         Err(err) => {
-            return Err(err).with_context(|| "Failed to download the generated project from spring api");
+            return Err(err)
+                .with_context(|| "Failed to download the generated project from spring api");
         }
     };
 
@@ -260,10 +261,7 @@ pub async fn generate_project(params: QueryParam, out_dir: PathBuf) -> Result<Pa
         project_dir,
         started.elapsed()
     );
-    println!(
-        "Generated a Spring Boot project in {:?}",
-        project_dir
-    );
+    println!("Generated a Spring Boot project in {:?}", project_dir);
 
     Ok(project_dir)
 }

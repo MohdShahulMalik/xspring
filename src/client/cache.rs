@@ -88,7 +88,11 @@ impl MetadataCache {
             None
         };
 
-        MetadataCache { path, entry, enabled }
+        MetadataCache {
+            path,
+            entry,
+            enabled,
+        }
     }
 
     /// The cached entry, if there is one.
@@ -112,7 +116,11 @@ impl MetadataCache {
             return Ok(());
         }
 
-        let entry = CacheEntry { etag, fetched_at: now, body };
+        let entry = CacheEntry {
+            etag,
+            fetched_at: now,
+            body,
+        };
         write_entry(&self.path, &entry)?;
         self.entry = Some(entry);
         Ok(())
@@ -187,7 +195,10 @@ fn read_entry(path: &Path) -> Option<CacheEntry> {
             Some(entry)
         }
         Err(err) => {
-            warn!("cache: {} is corrupt ({err}), discarding it", path.display());
+            warn!(
+                "cache: {} is corrupt ({err}), discarding it",
+                path.display()
+            );
             let _ = std::fs::remove_file(path);
             None
         }

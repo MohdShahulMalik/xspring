@@ -16,11 +16,11 @@ use std::path::PathBuf;
 use tracing::info;
 use tracing::level_filters::LevelFilter;
 use tracing_appender::rolling;
+use tracing_subscriber::Layer;
 use tracing_subscriber::filter::filter_fn;
 use tracing_subscriber::fmt;
 use tracing_subscriber::layer::SubscriberExt;
 use tracing_subscriber::util::SubscriberInitExt;
-use tracing_subscriber::Layer;
 
 /// Environment variable that overrides the maximum level written to the file.
 const LOG_LEVEL_ENV: &str = "XSPRING_LOG";

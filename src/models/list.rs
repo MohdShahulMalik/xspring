@@ -1,4 +1,4 @@
-use crate::models::spring::{Value, DependencyCategories};
+use crate::models::spring::{DependencyCategories, Value};
 
 pub enum Lists {
     Values(Vec<Value>),

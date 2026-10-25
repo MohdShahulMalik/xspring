@@ -1,4 +1,6 @@
-use xspring::handlers::add::{find_deps_block, insert_into_gradle, insert_into_pom, suggest_ids, Flavor};
+use xspring::handlers::add::{
+    Flavor, find_deps_block, insert_into_gradle, insert_into_pom, suggest_ids,
+};
 use xspring::models::deps_map::lookup;
 
 const MAVEN: &str = include_str!("fixtures/maven_with_comments/pom.xml");
@@ -12,7 +14,10 @@ fn deps(ids: &[&str]) -> Vec<(&'static str, &'static xspring::models::deps_map::
 
 /// `<artifactId>group…</artifactId>` marker for a resolved dep (for Maven assertions).
 fn maven_marker(id: &str) -> String {
-    format!("<artifactId>{}</artifactId>", lookup(id).unwrap().1.artifact)
+    format!(
+        "<artifactId>{}</artifactId>",
+        lookup(id).unwrap().1.artifact
+    )
 }
 
 /// `group:artifact` coordinates for a resolved dep (for Gradle assertions).
@@ -56,12 +61,18 @@ fn maven_never_touches_decoy_blocks_or_comments() {
 
     // decoy blocks keep exactly their original dependencies
     assert_eq!(
-        out.matches("<artifactId>spring-boot-dependencies</artifactId>").count(),
-        MAVEN.matches("<artifactId>spring-boot-dependencies</artifactId>").count()
+        out.matches("<artifactId>spring-boot-dependencies</artifactId>")
+            .count(),
+        MAVEN
+            .matches("<artifactId>spring-boot-dependencies</artifactId>")
+            .count()
     );
     assert_eq!(
-        out.matches("<artifactId>spring-boot-maven-plugin</artifactId>").count(),
-        MAVEN.matches("<artifactId>spring-boot-maven-plugin</artifactId>").count()
+        out.matches("<artifactId>spring-boot-maven-plugin</artifactId>")
+            .count(),
+        MAVEN
+            .matches("<artifactId>spring-boot-maven-plugin</artifactId>")
+            .count()
     );
 
     // comments survive byte-for-byte
@@ -139,7 +150,10 @@ fn maven_preserves_crlf_line_endings() {
     assert_eq!(out.matches("\r\n").count(), out.matches('\n').count());
 
     // exactly 4 new newlines (<dependency>, groupId, artifactId, </dependency>)
-    assert_eq!(out.matches("\r\n").count() - MAVEN_CRLF.matches("\r\n").count(), 4);
+    assert_eq!(
+        out.matches("\r\n").count() - MAVEN_CRLF.matches("\r\n").count(),
+        4
+    );
 
     lines_preserved(MAVEN_CRLF, &out);
 }
@@ -150,13 +164,19 @@ fn maven_preserves_crlf_line_endings() {
 
 #[test]
 fn groovy_inserts_with_single_quotes_and_matching_indent() {
-    let out =
-        insert_into_gradle(GROOVY, &deps(&["web", "configuration-processor"]), Flavor::Groovy)
-            .expect("insert succeeds");
+    let out = insert_into_gradle(
+        GROOVY,
+        &deps(&["web", "configuration-processor"]),
+        Flavor::Groovy,
+    )
+    .expect("insert succeeds");
 
     // file uses single quotes → emitted statements use single quotes
     assert!(out.contains(&format!("implementation '{}'", coords("web"))));
-    assert!(out.contains(&format!("annotationProcessor '{}'", coords("configuration-processor"))));
+    assert!(out.contains(&format!(
+        "annotationProcessor '{}'",
+        coords("configuration-processor")
+    )));
 
     // 4-space indentation like the existing scope lines
     assert!(out.contains(&format!("\n    implementation '{}'", coords("web"))));
@@ -187,7 +207,11 @@ fn groovy_reruns_skip_existing_dependencies() {
     // identical rerun must be a no-op error
     let second = insert_into_gradle(&first, &deps(&["web"]), Flavor::Groovy);
     assert!(
-        second.err().unwrap().to_string().contains("already present"),
+        second
+            .err()
+            .unwrap()
+            .to_string()
+            .contains("already present"),
         "second identical run should be a no-op error"
     );
 }
@@ -221,7 +245,13 @@ fn kts_inserts_with_parens_and_double_quotes() {
 fn kts_reruns_skip_existing_dependencies() {
     let first = insert_into_gradle(KTS, &deps(&["web"]), Flavor::Kts).expect("first insert");
     let second = insert_into_gradle(&first, &deps(&["web"]), Flavor::Kts);
-    assert!(second.err().unwrap().to_string().contains("already present"));
+    assert!(
+        second
+            .err()
+            .unwrap()
+            .to_string()
+            .contains("already present")
+    );
 }
 
 // ---------------------------------------------------------------------

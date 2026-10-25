@@ -1,9 +1,12 @@
-use inquire::{required, validator::Validation, MultiSelect, Select, Text};
 use anyhow::{Context, Result};
+use inquire::{MultiSelect, Select, Text, required, validator::Validation};
 use tracing::{debug, info, trace};
 
 use crate::models::spring::InitializrMetadata;
-use crate::{cli::interactive_ui::base_config, client::spring_initializr::get_metadata, models::spring::QueryParam};
+use crate::{
+    cli::interactive_ui::base_config, client::spring_initializr::get_metadata,
+    models::spring::QueryParam,
+};
 
 /// Controls which prompts are shown and which values fall back to the
 /// metadata defaults from start.spring.io.
@@ -27,14 +30,24 @@ pub struct InteractiveConfig {
 impl InteractiveConfig {
     /// Everything gets prompted (what `xspring` with no arguments does).
     pub fn full() -> Self {
-        Self { full: true, name_description: true, deps: true, maven: false }
+        Self {
+            full: true,
+            name_description: true,
+            deps: true,
+            maven: false,
+        }
     }
 
     /// The `xspring quick` behavior. Only the group and artifact id are
     /// always prompted, plus the name, description and dependencies when the
     /// flags ask for them.
     pub fn quick(maven: bool, extended: bool, deps: bool) -> Self {
-        Self { full: false, name_description: !extended, deps, maven }
+        Self {
+            full: false,
+            name_description: !extended,
+            deps,
+            maven,
+        }
     }
 }
 
@@ -53,7 +66,9 @@ fn ask_id(label: &'static str, help: &'static str, icon: &'static str) -> Result
         .with_validator(required!())
         .with_validator(|input: &str| {
             if input.contains(' ') {
-                Ok(Validation::Invalid("This field's input cannot contain spaces".into()))
+                Ok(Validation::Invalid(
+                    "This field's input cannot contain spaces".into(),
+                ))
             } else {
                 Ok(Validation::Valid)
             }
@@ -67,7 +82,11 @@ fn ask_id(label: &'static str, help: &'static str, icon: &'static str) -> Result
 /// Fixed fallbacks matching start.spring.io's own defaults when the API
 /// omits the `default` field for name/description.
 fn default_name(metadata: &InitializrMetadata) -> String {
-    metadata.name.default.clone().unwrap_or_else(|| "demo".to_string())
+    metadata
+        .name
+        .default
+        .clone()
+        .unwrap_or_else(|| "demo".to_string())
 }
 
 fn default_description(metadata: &InitializrMetadata) -> String {
@@ -118,13 +137,19 @@ pub async fn interactive(config: InteractiveConfig) -> Result<QueryParam> {
             .with_context(|| "Failed to get input for Description")?;
         if description.is_empty() {
             description = default_description(&spring_metadata);
-            debug!("Project description after replacing the empty string: {}", description);
+            debug!(
+                "Project description after replacing the empty string: {}",
+                description
+            );
         }
 
         (name, description)
     } else {
         debug!("Using default name/description");
-        (default_name(&spring_metadata), default_description(&spring_metadata))
+        (
+            default_name(&spring_metadata),
+            default_description(&spring_metadata),
+        )
     };
 
     // ------------------------------------------------------------------
@@ -229,7 +254,9 @@ pub async fn interactive(config: InteractiveConfig) -> Result<QueryParam> {
     // Dependencies (skippable)
     // ------------------------------------------------------------------
     let dependencies = if config.deps {
-        let dependency_names = spring_metadata.dependencies.values
+        let dependency_names = spring_metadata
+            .dependencies
+            .values
             .iter()
             .flat_map(|category| category.values.iter())
             .collect::<Vec<_>>();
@@ -237,7 +264,9 @@ pub async fn interactive(config: InteractiveConfig) -> Result<QueryParam> {
         let dependency_choices = MultiSelect::new("Dependencies:", dependency_names)
             .with_page_size(5)
             .with_keep_filter(true)
-            .with_help_message("🔍 Type to search • Space to select • ↑↓ to navigate • Enter to confirm")
+            .with_help_message(
+                "🔍 Type to search • Space to select • ↑↓ to navigate • Enter to confirm",
+            )
             .with_render_config(base_config("🧩"))
             .prompt()
             .with_context(|| "Failed to get input for Dependencies")?;
@@ -285,7 +314,9 @@ pub async fn pick_dependencies() -> Result<Vec<String>> {
         .await
         .with_context(|| "Failed to get the metadata")?;
 
-    let dependency_names = spring_metadata.dependencies.values
+    let dependency_names = spring_metadata
+        .dependencies
+        .values
         .iter()
         .flat_map(|category| category.values.iter())
         .collect::<Vec<_>>();
@@ -293,10 +324,15 @@ pub async fn pick_dependencies() -> Result<Vec<String>> {
     let dependency_choices = MultiSelect::new("Dependencies:", dependency_names)
         .with_page_size(5)
         .with_keep_filter(true)
-        .with_help_message("🔍 Type to search • Space to select • ↑↓ to navigate • Enter to confirm")
+        .with_help_message(
+            "🔍 Type to search • Space to select • ↑↓ to navigate • Enter to confirm",
+        )
         .with_render_config(base_config("🧩"))
         .prompt()
         .with_context(|| "Failed to get input for Dependencies")?;
 
-    Ok(dependency_choices.iter().map(|dep| dep.id.clone()).collect())
+    Ok(dependency_choices
+        .iter()
+        .map(|dep| dep.id.clone())
+        .collect())
 }

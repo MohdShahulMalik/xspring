@@ -12,7 +12,7 @@ use std::sync::{Arc, Mutex};
 use std::time::Duration;
 
 use reqwest::Client;
-use xspring::client::cache::{MetadataCache, DEFAULT_TTL_SECONDS};
+use xspring::client::cache::{DEFAULT_TTL_SECONDS, MetadataCache};
 use xspring::client::spring_initializr::get_metadata_with;
 
 const METADATA: &str = include_str!("fixtures/metadata.json");

@@ -1,8 +1,8 @@
 use clap::{ArgAction, ArgGroup, Subcommand};
 
 #[derive(Subcommand, Debug)]
-pub enum Commands{
-    Quick{
+pub enum Commands {
+    Quick {
         #[arg(short = 'm', long, action = ArgAction::SetTrue)]
         maven: bool,
 
@@ -38,5 +38,5 @@ pub enum Commands{
 
         #[arg(short = 'd', long, action = ArgAction::SetTrue)]
         deps: bool,
-    }
+    },
 }
