@@ -11,6 +11,17 @@ fn parse(args: &[&str]) -> Cli {
     Cli::parse_from(args)
 }
 
+/// Two list kinds at once are rejected instead of silently printing only the
+/// first one.
+#[test]
+fn two_list_kinds_at_once_are_rejected() {
+    let result = Cli::try_parse_from(expand_aliases(
+        ["xspring", "list", "-j", "-d"].iter().map(OsString::from),
+    ));
+
+    assert!(result.is_err());
+}
+
 #[test]
 fn the_shorthand_turns_off_the_git_repository() {
     let cli = parse(&["xspring", "-ng"]);

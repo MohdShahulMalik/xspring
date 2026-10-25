@@ -21,6 +21,7 @@ pub enum Commands {
     #[command(group(
         ArgGroup::new("list_item")
             .required(true)
+            .multiple(false)
             .args(["java", "boot", "project_type", "language", "deps"]),
     ))]
     List {
