@@ -151,6 +151,13 @@ pub fn cache_dir() -> PathBuf {
         return PathBuf::from(home).join(".cache").join("xspring");
     }
 
+    // No HOME-based location: prefer a user-private runtime directory over the
+    // shared temp dir, so another local user cannot pre-seed the cache. Logs
+    // wiped on reboot are an acceptable loss when there is no HOME anyway.
+    if let Some(runtime) = crate::util::env_non_empty("XDG_RUNTIME_DIR") {
+        return PathBuf::from(runtime).join("xspring");
+    }
+
     std::env::temp_dir().join("xspring")
 }
 
@@ -208,20 +215,10 @@ fn read_entry(path: &Path) -> Option<CacheEntry> {
 /// Writes the cache document atomically, so a crash mid-write can never leave
 /// a half-written file behind.
 fn write_entry(path: &Path, entry: &CacheEntry) -> io::Result<()> {
-    if let Some(parent) = path.parent() {
-        std::fs::create_dir_all(parent)?;
-    }
+    let json =
+        serde_json::to_vec(entry).map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err))?;
 
-    let json = serde_json::to_vec(entry)
-        .map_err(|err| io::Error::new(io::ErrorKind::InvalidData, err))?;
-
-    let tmp = path.with_extension("json.tmp");
-    std::fs::write(&tmp, &json)?;
-    match std::fs::rename(&tmp, path) {
-        Ok(()) => Ok(()),
-        Err(err) => {
-            let _ = std::fs::remove_file(&tmp);
-            Err(err)
-        }
-    }
+    // Owner-only: on a multi-user system no other account can read the cached
+    // document or tamper with it before the CLI revalidates it.
+    crate::util::atomic_write_full(path, &json, Some(0o600))
 }
