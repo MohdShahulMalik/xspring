@@ -39,5 +39,9 @@ pub enum Commands {
 
         #[arg(short = 'd', long, action = ArgAction::SetTrue)]
         deps: bool,
+
+        /// Only show dependencies whose id or name contains this text.
+        #[arg(short = 's', long, requires = "deps")]
+        search: Option<String>,
     },
 }

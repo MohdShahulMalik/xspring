@@ -105,14 +105,16 @@ async fn main() -> Result<()> {
                 print_values(&mut buf, languages).with_context(|| "Failed to print languages")?;
             }
 
-            Commands::List { deps: true, .. } => {
+            Commands::List {
+                deps: true, search, ..
+            } => {
                 let categories = get_lists("deps")
                     .await
                     .with_context(|| "Failed to get dependencies")?;
                 writeln!(&mut buf, "Available Dependencies:")?;
                 writeln!(&mut buf, " ")?;
 
-                print_categories(&mut buf, categories)
+                print_categories(&mut buf, categories, search.as_deref())
                     .with_context(|| "Failed to print Dependencies with Categories")?;
             }
 

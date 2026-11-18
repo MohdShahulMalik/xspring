@@ -37,14 +37,43 @@ pub fn print_values<W: Write>(buf: &mut BufWriter<W>, versions: Lists) -> Result
     Ok(())
 }
 
-pub fn print_categories<W: Write>(buf: &mut BufWriter<W>, categories: Lists) -> Result<()> {
+pub fn print_categories<W: Write>(
+    buf: &mut BufWriter<W>,
+    categories: Lists,
+    search: Option<&str>,
+) -> Result<()> {
     if let Categories(cats) = categories {
+        let query = search.map(|s| s.trim().to_lowercase());
+        let mut shown = 0usize;
+
         for category in cats {
+            let deps: Vec<_> = match &query {
+                Some(q) => category
+                    .values
+                    .into_iter()
+                    .filter(|dep| {
+                        dep.id.to_lowercase().contains(q) || dep.name.to_lowercase().contains(q)
+                    })
+                    .collect(),
+                None => category.values,
+            };
+
+            if deps.is_empty() {
+                continue;
+            }
+
             writeln!(buf, "{}:", category.name)?;
-            for dep in category.values {
-                writeln!(buf, "-{}", dep)?;
+            for dep in deps {
+                writeln!(buf, "-{} ({})", dep.name, dep.id)?;
+                shown += 1;
             }
             writeln!(buf, " ")?;
+        }
+
+        if let Some(q) = query
+            && shown == 0
+        {
+            writeln!(buf, "No dependencies match '{q}'")?;
         }
     } else {
         return Err(anyhow!(

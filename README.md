@@ -121,6 +121,7 @@ Unknown dependency id 'data-jpal'. Did you mean: data-jpa?
 ### Listing options
 
 - `xspring list --deps` or `-d`: dependencies
+- `xspring list --deps --search <query>` or `-s`: only dependencies whose id or name contains the query
 - `xspring list --boot` or `-b`: Spring Boot versions
 - `xspring list --java` or `-j`: Java versions
 - `xspring list --type` or `-t`: project types, Maven and Gradle
@@ -129,6 +130,9 @@ Unknown dependency id 'data-jpal'. Did you mean: data-jpa?
 ```bash
 # every available dependency
 $ xspring list --deps
+
+# just the redis-related ones
+$ xspring list --deps --search redis
 
 # every supported Java version
 $ xspring list --java
